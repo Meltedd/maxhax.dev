@@ -17,7 +17,7 @@ export const dynamic = 'force-static'
 <TimelineWrapper>
   {(() => {
     const reversedEntries = [...timelineEntries].reverse()
-    const reversedDelays = timelineEntries.map((entry) => entry.delay).reverse()
+    const originalDelays = timelineEntries.map((entry) => entry.delay)
 
     return reversedEntries.map((entry, index) => {
       const previousYear = index === 0 ? null : reversedEntries[index - 1]?.year
@@ -25,7 +25,7 @@ export const dynamic = 'force-static'
       const key = `${entry.year}-${entry.month}-${index}`
       const entryWithDelay = {
         ...entry,
-        delay: reversedDelays[index] ?? entry.delay,
+        delay: originalDelays[index] ?? entry.delay,
       }
 
       return (
