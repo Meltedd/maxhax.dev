@@ -86,12 +86,9 @@ export const components: Record<
       const code = await codeToHtml(props.children, {
         lang: 'jsx',
         theme: cssVariablesTheme,
-        // theme: 'min-light',
-        // theme: 'snazzy-light',
         transformers: [
           {
-            // Since we're using dangerouslySetInnerHTML, the code and pre
-            // tags should be removed.
+            // Since using dangerouslySetInnerHTML, code and pre tags should be removed.
             pre: (hast) => {
               if (hast.children.length !== 1) {
                 throw new Error('<pre>: Expected a single <code> child')
@@ -122,8 +119,6 @@ export const components: Record<
   img: async ({ src, alt, title }) => {
     let img: React.ReactNode
 
-    // External images use standard <img> tag for flexibility across various domains
-    // Local images use Next.js Image component for optimization
     if (src.startsWith('https://')) {
       img = (
         <img

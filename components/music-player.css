@@ -1,4 +1,4 @@
-/* Music Player Styles - Comprehensive spacing fix */
+/* Music Player */
 
 .rhap_container {
   box-sizing: border-box;
@@ -279,7 +279,7 @@
   display: none !important;
 }
 
-/* Utils - Override all possible sources of spacing */
+/* Utils */
 .rhap_button-clear {
   background-color: transparent !important;
   border: none !important;

@@ -58,7 +58,6 @@ export const viewport: Viewport = {
   themeColor: '#fcfcfc',
 }
 
-// Force static generation across the app (faster client transitions)
 export const dynamic = 'force-static'
 
 export default function RootLayout({
