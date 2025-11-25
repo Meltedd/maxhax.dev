@@ -1,102 +1,41 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useState, useTransition } from 'react'
+import { sendContactEmail } from './actions'
 
-const EMAIL_OPEN_DELAY = 800
-const RESET_DELAY = 2000
-const RATE_LIMIT_WINDOW = 30000
-const MAX_SUBJECT_LENGTH = 200
-const MAX_MESSAGE_LENGTH = 2000
-const MAX_URL_LENGTH = 6000
-const CONTACT_EMAIL = 'REDACTED'
+const MAX_MESSAGE_LENGTH = 5000
 
 export function ContactForm() {
+  const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
   const [subject, setSubject] = useState('')
   const [website, setWebsite] = useState('') // honeypot
-  const [isSaved, setIsSaved] = useState(false)
+  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [errorMsg, setErrorMsg] = useState('')
   const [isHovered, setIsHovered] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [rateLimited, setRateLimited] = useState(false)
-
-  const timeoutRefs = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
-
-  useEffect(() => {
-    return () => Object.values(timeoutRefs.current).forEach(clearTimeout)
-  }, [])
+  const [isPending, startTransition] = useTransition()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setError(null)
 
     if (website.trim()) return // bot check
+    if (!email.trim() || !message.trim() || isPending) return
 
-    try {
-      const lastSubmission = sessionStorage.getItem('contactFormLastSubmission')
-      if (lastSubmission) {
-        const elapsed = Date.now() - parseInt(lastSubmission, 10)
-        if (elapsed < RATE_LIMIT_WINDOW) {
-          setRateLimited(true)
-          timeoutRefs.current.rateLimit = setTimeout(() => setRateLimited(false), RATE_LIMIT_WINDOW - elapsed)
-          return
-        }
-      }
-    } catch { /* sessionStorage unavailable */ }
+    startTransition(async () => {
+      const result = await sendContactEmail(email, subject, message)
 
-    let validatedSubject = subject.trim().slice(0, MAX_SUBJECT_LENGTH)
-    let validatedMessage = message.trim().slice(0, MAX_MESSAGE_LENGTH)
-
-    if (!validatedMessage) return
-
-    let encodedSubject = encodeURIComponent(validatedSubject)
-    let encodedMessage = encodeURIComponent(validatedMessage)
-
-    if (`mailto:${CONTACT_EMAIL}?subject=${encodedSubject}&body=${encodedMessage}`.length > MAX_URL_LENGTH) {
-      const baseUrlLength = `mailto:${CONTACT_EMAIL}?subject=${encodedSubject}&body=`.length
-      const maxMessageLength = MAX_URL_LENGTH - baseUrlLength
-
-      if (maxMessageLength > 0) {
-        // Encoded length is ~1-3x original; use conservative 2x estimate
-        let truncated = validatedMessage.slice(0, Math.floor(maxMessageLength / 2))
-        let testUrl = `mailto:${CONTACT_EMAIL}?subject=${encodedSubject}&body=${encodeURIComponent(truncated)}`
-
-        while (testUrl.length > MAX_URL_LENGTH && truncated.length > 0) {
-          truncated = truncated.slice(0, -10)
-          testUrl = `mailto:${CONTACT_EMAIL}?subject=${encodedSubject}&body=${encodeURIComponent(truncated)}`
-        }
-
-        validatedMessage = truncated
-        encodedMessage = encodeURIComponent(truncated)
+      if (result.success) {
+        setStatus('success')
+        setEmail('')
+        setMessage('')
+        setSubject('')
+        setTimeout(() => setStatus('idle'), 3000)
       } else {
-        const baseLength = `mailto:${CONTACT_EMAIL}?subject=&body=`.length
-        const available = Math.floor((MAX_URL_LENGTH - baseLength) / 2)
-        validatedSubject = validatedSubject.slice(0, available)
-        validatedMessage = validatedMessage.slice(0, available)
-        encodedSubject = encodeURIComponent(validatedSubject)
-        encodedMessage = encodeURIComponent(validatedMessage)
+        setStatus('error')
+        setErrorMsg(result.error)
+        setTimeout(() => setStatus('idle'), 4000)
       }
-    }
-
-    setIsSaved(true)
-
-    try {
-      sessionStorage.setItem('contactFormLastSubmission', Date.now().toString())
-    } catch { /* sessionStorage unavailable */ }
-
-    timeoutRefs.current.open = setTimeout(() => {
-      try {
-        window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(validatedSubject)}&body=${encodeURIComponent(validatedMessage)}`
-      } catch {
-        setError(CONTACT_EMAIL)
-        setIsSaved(false)
-      }
-    }, EMAIL_OPEN_DELAY)
-
-    timeoutRefs.current.reset = setTimeout(() => {
-      setIsSaved(false)
-      setMessage('')
-      setSubject('')
-    }, RESET_DELAY)
+    })
   }
 
   return (
@@ -111,38 +50,22 @@ export function ContactForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col border border-rurikon-border rounded bg-rurikon-50/30 w-full">
-        <div className="px-[clamp(0.75rem,2vw,1rem)] py-[clamp(0.25rem,0.8vw,0.375rem)] flex items-center justify-between border-b border-rurikon-border gap-[clamp(0.5rem,1.5vw,0.75rem)]">
-          <div className="flex items-center gap-[clamp(0.5rem,1.5vw,0.75rem)] min-w-0 flex-1">
-            <label htmlFor="subject" className="sr-only">Subject:</label>
+        <div className="border-b border-rurikon-border">
+          <div className="px-[clamp(0.75rem,2vw,1rem)] py-[clamp(0.375rem,1vw,0.5rem)] flex items-center gap-[clamp(0.5rem,1.5vw,0.75rem)]">
+            <label htmlFor="email" className="sr-only">Your email:</label>
             <input
-              id="subject"
-              type="text"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              className="text-[clamp(1rem,1.8vw,1.125rem)] text-rurikon-600 font-serif bg-transparent border-none outline-none placeholder:italic eb-garamond-placeholder min-w-0 w-full"
-              placeholder="Subject"
-              name="subject"
-              autoComplete="off"
-              maxLength={200}
-              aria-label="Email subject"
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="flex-1 min-w-0 text-[clamp(1rem,1.8vw,1.125rem)] text-rurikon-600 font-serif bg-transparent border-none outline-none placeholder:italic eb-garamond-placeholder"
+              placeholder="Your email"
+              name="email"
+              autoComplete="email"
+              required
+              aria-label="Your email address"
             />
-          </div>
-
-          <div className="flex items-center gap-[clamp(0.5rem,1.5vw,0.75rem)] shrink-0">
-            {isSaved && (
-              <span className="text-[clamp(0.85rem,1.5vw,1rem)] text-rurikon-300 font-serif italic">saved</span>
-            )}
-            {error && (
-              <span className="text-[clamp(0.85rem,1.5vw,1rem)] text-rurikon-600 font-serif italic" role="alert" aria-live="polite">
-                {error}
-              </span>
-            )}
-            {rateLimited && (
-              <span className="text-[clamp(0.85rem,1.5vw,1rem)] text-rurikon-300 font-serif italic" role="status" aria-live="polite">
-                please wait
-              </span>
-            )}
-            <nav aria-label="Social links" className="flex items-center gap-[clamp(0.5rem,1.5vw,0.75rem)] text-rurikon-300 text-[clamp(0.85rem,1.5vw,0.96rem)]">
+            <nav aria-label="Social links" className="flex items-center gap-[clamp(0.5rem,1.5vw,0.75rem)] text-rurikon-300 text-[clamp(0.85rem,1.5vw,0.96rem)] shrink-0">
               <a
                 href="https://www.linkedin.com/in/max-harari-b35231359/"
                 target="_blank"
@@ -172,6 +95,37 @@ export function ContactForm() {
               </a>
             </nav>
           </div>
+
+          <div className="px-[clamp(0.75rem,2vw,1rem)] py-[clamp(0.375rem,1vw,0.5rem)] flex items-center gap-[clamp(0.5rem,1.5vw,0.75rem)] border-t border-rurikon-border/50">
+            <label htmlFor="subject" className="sr-only">Subject:</label>
+            <input
+              id="subject"
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              className="flex-1 min-w-0 text-[clamp(1rem,1.8vw,1.125rem)] text-rurikon-600 font-serif bg-transparent border-none outline-none placeholder:italic eb-garamond-placeholder"
+              placeholder="Subject (optional)"
+              name="subject"
+              autoComplete="off"
+              maxLength={200}
+              aria-label="Email subject"
+            />
+            <div className="flex items-center gap-[clamp(0.5rem,1.5vw,0.75rem)] shrink-0">
+              {status === 'success' && (
+                <span className="text-[clamp(0.85rem,1.5vw,1rem)] text-rurikon-300 font-serif italic">sent</span>
+              )}
+              {status === 'error' && (
+                <span className="text-[clamp(0.85rem,1.5vw,1rem)] text-red-500 font-serif italic" role="alert" aria-live="polite">
+                  {errorMsg}
+                </span>
+              )}
+              {isPending && (
+                <span className="text-[clamp(0.85rem,1.5vw,1rem)] text-rurikon-300 font-serif italic" role="status" aria-live="polite">
+                  sending...
+                </span>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Honeypot */}
@@ -198,7 +152,7 @@ export function ContactForm() {
           style={{ minHeight: 'clamp(220px, 32vw, 460px)', caretColor: '#45403a', lineHeight: '1.5' }}
           name="message"
           autoComplete="off"
-          maxLength={2000}
+          maxLength={MAX_MESSAGE_LENGTH}
           aria-label="Message content"
           aria-describedby="message-length"
         />
@@ -210,19 +164,19 @@ export function ContactForm() {
 
           <button
             type="submit"
-            disabled={!message.trim() || isSaved || rateLimited}
+            disabled={!email.trim() || !message.trim() || isPending || status === 'success'}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             className="text-[clamp(0.9rem,1.6vw,1rem)] text-rurikon-600 hover:text-[#B85252] font-serif eb-garamond-italic transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed inline-flex items-center gap-[clamp(0.2rem,0.8vw,0.25rem)]"
-            aria-label={isSaved ? 'Message sent' : rateLimited ? 'Please wait before sending again' : 'Send message'}
+            aria-label={status === 'success' ? 'Message sent' : isPending ? 'Sending message' : 'Send message'}
           >
             <span className="inline-flex items-center transition-all duration-300 ease-out opacity-90" aria-hidden>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-[0.95em] w-[0.95em] relative top-[0.125em]">
                 <path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2Zm-.4 3.25l-6.96 4.35a2 2 0 01-2.08 0L3.6 7.25a.75.75 0 11.8-1.26l6.96 4.35a.5.5 0 00.52 0L18.84 6a.75.75 0 11.76 1.25Z" />
               </svg>
             </span>
-            <span>{isSaved ? 'sent' : 'send'}</span>
-            <span className={`transition-all duration-300 ease-out ${isHovered && !isSaved ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2'}`}>
+            <span>{status === 'success' ? 'sent' : isPending ? 'sending' : 'send'}</span>
+            <span className={`transition-all duration-300 ease-out ${isHovered && status === 'idle' && !isPending ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2'}`}>
               →
             </span>
           </button>
