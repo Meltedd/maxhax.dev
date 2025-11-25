@@ -55,7 +55,3 @@ public/           # Static assets
 ## Deployment
 
 Configured for Vercel. Import the repo, select the Next.js preset, and add the environment variables above.
-
-## License
-
-MIT
