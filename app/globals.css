@@ -211,7 +211,6 @@ h1.eb-garamond-italic {
   animation: textFadeIn 1s ease-out forwards;
   filter: blur(4px);
   opacity: 0;
-  display: inline-block;
 }
 
 .stagger-timeline-entry {
