@@ -1,0 +1,54 @@
+export const metadata = {
+  title: 'On Control Flow',
+  date: '2025.09.30',
+  description: 'How systems become what they were never meant to be',
+}
+
+# On Control Flow
+
+> "There are no facts, only interpretations."
+>
+>  — Friedrich Nietzsche
+
+In C, a function call is a name and a set of arguments. The compiler reduces it to an address loaded into a register and a jump instruction, stored in the same writable memory as the rest of the program's data. Anything that can write to that memory can change where the jump goes.
+
+In this struct, a [function pointer](https://en.wikipedia.org/wiki/Function_pointer) sits directly after a 64-byte buffer:
+```c
+struct Object {
+    char buffer[64];
+    void (*handler)(char *data);
+};
+
+void process(struct Object *obj, char *input) {
+    strcpy(obj->buffer, input);
+    obj->handler(obj->buffer);
+}
+```
+
+`strcpy` doesn't check bounds, so [overflowing](https://en.wikipedia.org/wiki/Buffer_overflow) past 64 bytes writes directly into `handler`.
+
+<BlockSideTitle title={<>
+  The buffer and function pointer are adjacent in memory.
+</>}>
+```
++---------------------+
+|  buffer (64 bytes)    |  <- input
++---------------------+
+|  handler (8 bytes)    |  <- overflow
++---------------------+
+```
+</BlockSideTitle>
+
+When the program calls `obj->handler()`, the processor loads whatever address is stored there and jumps; the instruction is the same whether the address came from the compiler or from input that overran the buffer. Every indirect call works this way (vtable dispatch, callbacks, computed jumps), and the only thing separating a valid target from a corrupted one is the conventions the compiler followed, which exist only in the compiled code.
+
+## Convention
+
+[DEP](https://en.wikipedia.org/wiki/Executable-space_protection) separated code from data by marking data memory as non-executable, so even if an attacker overwrites a pointer, shellcode on the stack or heap won't run.
+
+The program's own compiled code is still executable, though, and [return-oriented programming](https://en.wikipedia.org/wiki/Return-oriented_programming) chains short sequences of it (each ending in a `ret`) by arranging their addresses on the stack, so each return passes control to the next. The instructions being executed are the compiler's, but what they 'do' depends on the order they run in, and the order is controlled by whatever the attacker put on the stack, all while DEP's separation of code and data holds.
+
+## Constraint
+
+[CFI](https://en.wikipedia.org/wiki/Control-flow_integrity) restricts where indirect calls can land by checking that targets are valid function entries, and [CET](https://en.wikipedia.org/wiki/Control-flow_enforcement_technology) adds a second copy of return addresses (in memory that software can't write to) checked on every `ret`, and requires indirect call targets to be marked in the binary.
+
+For decades, the processor just executed whatever address it was given, and what counted as valid control flow was defined entirely by convention in the compiled code. CFI and CET make the processor check calls and returns against constraints that, until now, only existed in the compiler's output. Every generation of control flow defense so far has eventually been [outgrown](https://cispa.de/en/cfop). I think the pace of that cycle is part of why these defenses are moving into the hardware, and why security professionals and software engineers alike need to understand control flow at both levels in order to build systems on top of rapidly changing assumptions, safely.

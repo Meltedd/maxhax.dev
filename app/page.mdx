@@ -1,0 +1,71 @@
+import { Stagger, StaggerTitle } from '@/components/StaggerText'
+
+export const metadata = { title: 'Max Harari' }
+export const dynamic = 'force-static'
+
+<div className="mb-8 mobile:mb-10">
+  <h1 className="text-[3.5rem] font-bold text-rurikon-700 mb-4 mobile:mb-6 tracking-tight eb-garamond-italic">
+    <StaggerTitle text="Hey, I'm Max Harari" />
+  </h1>
+
+  <div className="space-y-4">
+    <div className="max-w-[42ch] mb-8 mobile:mb-10">
+      <div className="text-[clamp(1.2rem,calc(0.9vw+1.1rem),1.5rem)] text-rurikon-700 font-serif font-light italic relative">
+        <Stagger start={1.0} items={[
+          "I'm a",
+          { text: "Security Researcher", className: "font-semibold" },
+          "and",
+          { text: "Software Engineer", className: "font-semibold" },
+          ", studying at",
+          { text: "Stevens", href: "https://www.stevens.edu" },
+          "."
+        ]} />
+      </div>
+    </div>
+  </div>
+  
+  <div className="content-width space-y-4 mobile:space-y-5 text-[clamp(0.85rem,0.5vw+0.8rem,1.05rem)] text-rurikon-600 font-serif">
+    <p>
+      <Stagger start={1.13} items={[
+        "I specialize in",
+        { text: "vulnerability research", className: "font-semibold eb-garamond-italic" },
+        ",",
+        { text: "penetration testing", className: "font-semibold eb-garamond-italic" },
+        ", and",
+        { text: "applied machine learning", className: "font-semibold eb-garamond-italic" },
+        "."
+      ]} />
+    </p>
+    
+    <p>
+      <Stagger start={1.25} items={[
+        "I care deeply about open source, and have contributed to major projects such as",
+        { text: "Node.js", href: "https://nodejs.org", className: "font-semibold eb-garamond-italic" },
+        "in my free time."
+      ]} />
+    </p>
+    
+    <p>
+      <Stagger start={1.43} items={[
+        "My security research is primarily done through",
+        { text: "HackerOne", href: "https://hackerone.com/0xmaxhax", className: "font-semibold eb-garamond-italic" },
+        ", where I hunt for vulnerabilities in production systems and open source projects. I also write about security, software, and occasionally philosophy over",
+        { text: "here", href: "/thoughts", className: "font-semibold eb-garamond-italic" },
+        "."
+      ]} />
+    </p>
+    
+    <p>
+      <Stagger start={1.76} items={[
+        "If you get to know me, you'll find that my morality is inseparable from who I am. It shapes what I believe in, how I treat others, how I conduct my research, and what I choose to pursue. I like to think that what I leave behind will say more about my character than anything I could say."
+      ]} />
+    </p>
+    
+    <p>
+      <Stagger start={2.35} items={[
+        "Have something worth securing?",
+        { text: "Get in touch.", href: "/contact", className: "text-rurikon-700" }
+      ]} />
+    </p>
+  </div>
+</div>

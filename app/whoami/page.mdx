@@ -1,0 +1,30 @@
+import { TimelineWrapper } from '@/components/TimelineWrapper'
+import { timelineEntries } from '@/components/timeline-data'
+import { TimelineEntry } from '@/components/TimelineEntry'
+
+export const metadata = {
+  title: 'Whoami',
+}
+
+export const dynamic = 'force-static'
+
+<div className="content-width mb-16">
+  <h1 className="text-4xl sm:text-5xl font-bold text-rurikon-700 mb-[clamp(0.75rem,2vw,1.25rem)] tracking-tight eb-garamond-italic">Whoami</h1>
+  <p className="text-rurikon-400 mb-8 text-lg eb-garamond-italic">Security researcher and software engineer. I find bugs, contribute to open source, and break things professionally.</p>
+</div>
+
+<TimelineWrapper initialYear={timelineEntries[timelineEntries.length - 1].year}>
+  {(() => {
+    const BASE_DELAY = 0.12
+    const DELAY_STEP = 0.35
+    const reversedEntries = [...timelineEntries].reverse()
+
+    return reversedEntries.map((entry, index) => (
+      <TimelineEntry
+        key={`${entry.year}-${entry.month}-${index}`}
+        entry={entry}
+        delay={BASE_DELAY + index * DELAY_STEP}
+      />
+    ))
+  })()}
+</TimelineWrapper>

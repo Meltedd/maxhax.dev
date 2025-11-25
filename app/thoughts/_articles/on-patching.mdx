@@ -1,0 +1,17 @@
+export const metadata = {
+  title: 'On Patching',
+  date: '2024.09.27',
+  description: 'Why fixing vulnerabilities often creates new problems.',
+}
+
+# On Patching
+
+A critical vulnerability drops, and the cycle is always the same: disclosure, rush a fix, then scramble to update. The patch that follows often fixes the vulnerability while unknowingly breaking something else.
+
+Developers writing these patches understand the specific vulnerability but rarely how other code depends on the behavior being changed.
+
+The [Meltdown and Spectre patches](https://meltdownattack.com/) required fundamental changes to how operating systems handle memory isolation, adding checks that slowed performance and broke specific virtualization setups. We're still managing those regressions years later, and it was naive to think we could trivially patch something that runs that deep in how processors work without rippling repercussions.
+
+## Entanglement
+
+Most vulnerabilities are entangled with the system's design and history, not discrete problems you can solve in isolation. Over time the system adapts around its faults, and pulling one out compromises what grew to depend on it, or introduces code paths that haven't been tested through years of use. I've learned that reading patch diffs the same way I read vulnerability disclosures can be more valuable a habit than one would expect.
