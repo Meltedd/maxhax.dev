@@ -35,7 +35,7 @@ export async function sendContactEmail(
 
   try {
     const { error } = await resend.emails.send({
-      from: 'Contact Form <onboarding@resend.dev>',
+      from: 'maxhax.dev <contact@maxhax.dev>',
       to: CONTACT_EMAIL,
       replyTo: trimmedEmail,
       subject: trimmedSubject || 'New message from contact form',
