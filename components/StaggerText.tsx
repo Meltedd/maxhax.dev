@@ -12,7 +12,7 @@ export function StaggerTitle({ text, end = '.' }: StaggerTitleProps) {
       {words.map((word, i) => (
         <Fragment key={i}>
           <span
-            className="zen-text-part"
+            className="stagger-title"
             style={{ animationDelay: `${0.1 + i * 0.2}s` }}
           >
             {word}
@@ -20,7 +20,7 @@ export function StaggerTitle({ text, end = '.' }: StaggerTitleProps) {
           {i < words.length - 1 && ' '}
         </Fragment>
       ))}
-      <span className="zen-period-dot">{end}</span>
+      <span className="stagger-dot">{end}</span>
     </>
   )
 }
@@ -62,7 +62,7 @@ export function Stagger({ start, step = 0.01, items }: StaggerProps) {
             <Fragment key={i}>
               <a
                 href={item.href}
-                className={`zen-word underline decoration-1 underline-offset-4 font-semibold eb-garamond-italic${extraClass}`}
+                className={`stagger-word underline decoration-1 underline-offset-4 font-semibold eb-garamond-italic${extraClass}`}
                 style={{ animationDelay: `${delay.toFixed(2)}s` }}
               >
                 {text}
@@ -78,7 +78,7 @@ export function Stagger({ start, step = 0.01, items }: StaggerProps) {
           return (
             <Fragment key={wi}>
               <span
-                className={`zen-word${extraClass}`}
+                className={`stagger-word${extraClass}`}
                 style={{ animationDelay: `${delay.toFixed(2)}s` }}
               >
                 {word}

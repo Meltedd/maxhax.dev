@@ -1,7 +1,8 @@
 'use client'
 
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState, useTransition } from 'react'
 import cn from 'clsx'
+import { sendContactEmail } from '@/app/contact/actions'
 
 const MAX_MESSAGE_LENGTH = 5000
 
@@ -28,26 +29,48 @@ export function ContactForm() {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
   const [subject, setSubject] = useState('')
-  const [sent, setSent] = useState(false)
-  const sentTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const statusTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [errorMsg, setErrorMsg] = useState('')
+  const [isPending, startTransition] = useTransition()
 
   useEffect(() => {
     return () => {
-      if (sentTimeout.current) clearTimeout(sentTimeout.current)
+      if (statusTimeout.current) clearTimeout(statusTimeout.current)
     }
   }, [])
 
+  const setTemporaryStatus = (kind: 'success' | 'error', duration: number) => {
+    if (statusTimeout.current) clearTimeout(statusTimeout.current)
+    setStatus(kind)
+    statusTimeout.current = setTimeout(() => setStatus('idle'), duration)
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim() || !message.trim()) return
 
-    setEmail('')
-    setMessage('')
-    setSubject('')
-    setSent(true)
-    if (sentTimeout.current) clearTimeout(sentTimeout.current)
-    sentTimeout.current = setTimeout(() => setSent(false), 3000)
+    if (!email.trim() || !message.trim() || isPending) return
+
+    startTransition(async () => {
+      const result = await sendContactEmail(email, subject, message)
+
+      if (result.success) {
+        setEmail('')
+        setMessage('')
+        setSubject('')
+        setTemporaryStatus('success', 3000)
+      } else {
+        setErrorMsg(result.error)
+        setTemporaryStatus('error', 4000)
+      }
+    })
   }
+
+  const indicator: { text: string; tone: string; role?: 'status' | 'alert' } | null =
+    isPending ? { text: 'sending...', tone: 'text-rurikon-300', role: 'status' }
+    : status === 'success' ? { text: 'sent', tone: 'text-rurikon-300' }
+    : status === 'error' ? { text: errorMsg, tone: 'text-red-500', role: 'alert' }
+    : null
 
   return (
     <>
@@ -115,12 +138,13 @@ export function ContactForm() {
               maxLength={200}
             />
             <div className="flex items-center gap-[clamp(0.5rem,1.5vw,0.75rem)] shrink-0">
-              {sent && (
+              {indicator && (
                 <span
-                  className="text-[clamp(0.85rem,1.5vw,1rem)] font-serif italic text-rurikon-300"
+                  className={cn('text-[clamp(0.85rem,1.5vw,1rem)] font-serif italic', indicator.tone)}
+                  role={indicator.role}
                   aria-live="polite"
                 >
-                  sent
+                  {indicator.text}
                 </span>
               )}
             </div>
@@ -153,20 +177,20 @@ export function ContactForm() {
 
           <button
             type="submit"
-            disabled={!email.trim() || !message.trim()}
+            disabled={!email.trim() || !message.trim() || isPending}
             className="group text-[clamp(0.9rem,1.6vw,1rem)] text-rurikon-600 hover:text-link-hover font-serif eb-garamond-italic transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed inline-flex items-center gap-[clamp(0.2rem,0.8vw,0.25rem)]"
-            aria-label={sent ? 'Message sent' : 'Send message'}
+            aria-label={status === 'success' ? 'Message sent' : isPending ? 'Sending message' : 'Send message'}
           >
             <span className="inline-flex items-center transition-all duration-300 ease-out opacity-90" aria-hidden>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-[0.95em] w-[0.95em] relative top-[0.125em]">
                 <path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2Zm-.4 3.25l-6.96 4.35a2 2 0 01-2.08 0L3.6 7.25a.75.75 0 11.8-1.26l6.96 4.35a.5.5 0 00.52 0L18.84 6a.75.75 0 11.76 1.25Z" />
               </svg>
             </span>
-            <span>{sent ? 'sent' : 'send'}</span>
+            <span>{status === 'success' ? 'sent' : isPending ? 'sending' : 'send'}</span>
             <span
               className={cn(
                 'transition-all duration-300 ease-out opacity-0 -translate-x-2',
-                !sent && 'group-hover:opacity-100 group-hover:translate-x-0'
+                status === 'idle' && !isPending && 'group-hover:opacity-100 group-hover:translate-x-0'
               )}
             >
               →

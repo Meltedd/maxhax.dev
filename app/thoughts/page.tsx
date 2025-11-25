@@ -8,7 +8,6 @@ export const metadata = {
 
 export const dynamic = 'force-static'
 
-// In the future we can have a pagination here e.g. /1/*.mdx
 const articlesDirectory = path.join(
   process.cwd(),
   'app',
