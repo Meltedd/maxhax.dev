@@ -1,29 +1,61 @@
 # maxhax.dev
 
-Personal site + writing portfolio → [https://maxhax.dev](https://maxhax.dev)
+Personal portfolio and blog. Live at [maxhax.dev](https://maxhax.dev).
 
 ## Stack
-- Next.js 15 App Router (static-first, view transitions enabled)
-- MDX (Rust compiler) + Shiki highlighting in server components
-- Tailwind CSS v4 pipeline via `@tailwindcss/postcss`
-- Local/Google fonts via `next/font`, KaTeX for math, Vercel Analytics
 
-## Working locally
+- **Framework:** Next.js 15 (App Router)
+- **Styling:** Tailwind CSS v4
+- **Content:** MDX + Shiki
+- **Email:** Resend
+- **Deployment:** Vercel
+
+## Setup
+
+Requires Node.js 18+ and pnpm.
+
 ```bash
-pnpm install     # Node 18+
-pnpm dev         # Next dev server with Turbo
-pnpm lint        # ESLint (Next core-web-vitals, max warnings = 0)
-pnpm type-check  # tsc --noEmit
-pnpm build       # Production build (same command Vercel runs)
+pnpm install
+pnpm dev
 ```
 
-## Quality gates
-- ESLint flat config layers `@eslint/js`, `@next/eslint-plugin-next`, and `eslint-plugin-react`.
-- TypeScript is `strict` with bundler module resolution and Next plugin hints.
-- Content Security Policy, HSTS, and Permissions Policy ship via `next.config.ts`.
+## Environment Variables
 
-## Deployment (Vercel)
-1. Import repo and choose the **Next.js** preset.
-2. Build: `pnpm build` · Output: `.next` · Runtime: Node 18+ (works with `sharp@0.34`).
-3. Env vars: none for now - add via Project Settings if needed for APIs.
-4. Analytics + security headers are configured in `next.config.ts` and apply to every preview/production build.
+Required for the contact form:
+
+| Variable | Description |
+| -------- | ----------- |
+| `RESEND_API_KEY` | API key from [Resend](https://resend.com) |
+| `CONTACT_EMAIL` | Email address to receive contact form submissions |
+
+## Scripts
+
+| Command | Description |
+| ------- | ----------- |
+| `pnpm dev` | Start dev server |
+| `pnpm build` | Production build |
+| `pnpm start` | Start production server |
+| `pnpm lint` | Run ESLint |
+| `pnpm type-check` | Run TypeScript checks |
+
+## Structure
+
+```
+app/
+├── contact/      # Contact form
+├── thoughts/     # Blog (MDX articles)
+├── whoami/       # About page
+└── page.mdx      # Home
+
+components/       # React components
+assets/           # Images
+public/           # Static assets
+```
+
+## Deployment
+
+Configured for Vercel. Import the repo, select the Next.js preset, and add the environment variables above.
+
+## License
+
+MIT
