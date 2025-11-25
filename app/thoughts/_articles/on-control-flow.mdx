@@ -1,0 +1,51 @@
+export const metadata = {
+  title: 'On Control Flow',
+  date: '2025.09.30',
+  description: 'How systems become what they were never meant to be',
+}
+
+# On Control Flow
+
+> "There are no facts, only interpretations."
+>
+>  — Friedrich Nietzsche
+
+Code describes a theoretical state: call this function, return here. Hardware ignores this theory. It operates on raw memory addresses, indifferent to the high-level abstractions of control flow. If you can write to the right address, you can change what the program does next.
+
+## Function Pointers
+
+Indirect calls work by storing an address and jumping to it at runtime:
+```c
+struct Object {
+    char buffer[64];
+    void (*handler)(char *data);
+};
+
+void process(struct Object *obj, char *input) {
+    strcpy(obj->buffer, input);
+    // no bounds checking
+    obj->handler(obj->buffer);   // call through pointer
+}
+```
+
+The handler points to a legitimate function. If you overflow the buffer, you overwrite the function pointer. When the program calls `obj->handler()`, it jumps to whatever address you wrote there.
+
+<BlockSideTitle title={<>
+  Memory layout before and after overflow. The function pointer gets overwritten along with the buffer.
+</>}>
+```
+Normal object:           After overflow:
+[buffer: 64 bytes]      [buffer: "A" * 72]
+[handler: 0x401234]     [handler: 0xdeadbeef]
+```
+</BlockSideTitle>
+
+C++ vtables work this way. Callback mechanisms work this way. Any indirect call works this way. The program stores an address in memory and assumes it points to valid code. If you can write to that memory, you can redirect execution.
+
+Virtual methods are implemented as function pointers in vtables. Callbacks are function pointers passed as arguments. At runtime, these are all just addresses being dereferenced and jumped to.
+
+## Hardware Reality
+
+The processor has no concept of whether an address came from a legitimate call or from corrupted memory; it indiscriminately executes whatever address is stored in the register.
+
+Modern mitigations add verification layers. CFI checks that indirect calls target valid functions, while CET uses hardware shadow stacks to verify return addresses. These protections represent the hardware evolving to enforce the software's original intent, creating a stricter environment where raw memory access is no longer sufficient to hijack control.

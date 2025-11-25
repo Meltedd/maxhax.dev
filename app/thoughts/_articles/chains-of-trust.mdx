@@ -1,0 +1,31 @@
+export const metadata = {
+  title: 'The Chains of Trust',
+  date: '2025.10.17',
+  description: 'A commentary on the limits of verification',
+}
+
+# The Chains of Trust
+
+Public key cryptography solves the problem of communicating with strangers, but only by relying on a third party to vouch for them. We built a system to verify identity that inherently depends on an external authority.
+
+Encryption solves the mathematics of secrecy. It does not solve identity.
+
+If an attacker intercepts a connection and negotiates their own encryption, then forwards the traffic to the real server, the channel is secure but the identity is wrong. Certificates aim to fix this by proving the server is who they say they are. Yet proving identity requires an authority you already trust to confirm it.
+
+The system reintroduces the trusted intermediaries it was designed to eliminate.
+
+<BlockSideTitle title={<>
+  Certificate chains establish trust by delegating authority from root CAs to intermediate CAs to end-entity certificates. Each link vouches for the next.
+</>}>
+<div className="framed">![Certificate Chain](https://docs.apigee.com/static/images/ht-validate-cert-chain-image1.png)</div>
+</BlockSideTitle>
+
+This limitation is structural. CAs get compromised, issue certificates to the wrong entities, or fail audits. The DigiNotar breach in 2011 resulted in fraudulent certificates for Google being trusted by every browser.
+
+The response was to add [Certificate Transparency logs](https://certificate.transparency.dev/) to monitor issuance. The system added oversight mechanisms because the foundational trust model is brittle.
+
+Corporate networks utilize this exact mechanism to inspect traffic. They install a root certificate on user machines and intercept HTTPS traffic by generating fake certificates on the fly. This is functionally identical to a malicious interception; the difference lies only in the policy of the network owner.
+
+There is no cryptographic workaround for this structural problem. Verifying a server's identity requires trusting an entity to confirm that identity. We can distribute that trust or monitor for misbehavior, but the system ultimately rests on organizations running software.
+
+Encryption mathematics are absolute, but institutional trust is not; the system functions only until the human element fails.
