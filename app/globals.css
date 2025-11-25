@@ -1,36 +1,20 @@
+/* Imports */
 @import 'tailwindcss';
 @source "../mdx-components.tsx";
 
 @layer utilities {
-  .font-thin {
-    font-variation-settings: 'wght' 100, var(--sans-variation);
-  }
-  .font-extralight {
-    font-variation-settings: 'wght' 200, var(--sans-variation);
-  }
-  .font-light {
-    font-variation-settings: 'wght' 300, var(--sans-variation);
-  }
-  .font-normal {
-    font-variation-settings: 'wght' 440, var(--sans-variation);
-  }
-  .font-medium {
-    font-variation-settings: 'wght' 500, var(--sans-variation);
-  }
-  .font-semibold {
-    font-variation-settings: 'wght' 600, var(--sans-variation);
-  }
-  .font-bold {
-    font-variation-settings: 'wght' 640, var(--sans-variation);
-  }
-  .font-extrabold {
-    font-variation-settings: 'wght' 700, var(--sans-variation);
-  }
-  .font-black {
-    font-variation-settings: 'wght' 800, var(--sans-variation);
-  }
+  .font-thin { font-variation-settings: 'wght' 100, var(--sans-variation); }
+  .font-extralight { font-variation-settings: 'wght' 200, var(--sans-variation); }
+  .font-light { font-variation-settings: 'wght' 300, var(--sans-variation); }
+  .font-normal { font-variation-settings: 'wght' 440, var(--sans-variation); }
+  .font-medium { font-variation-settings: 'wght' 500, var(--sans-variation); }
+  .font-semibold { font-variation-settings: 'wght' 600, var(--sans-variation); }
+  .font-bold { font-variation-settings: 'wght' 640, var(--sans-variation); }
+  .font-extrabold { font-variation-settings: 'wght' 700, var(--sans-variation); }
+  .font-black { font-variation-settings: 'wght' 800, var(--sans-variation); }
 }
 
+/* Theme */
 @theme {
   --color-rurikon-50: #ebeceb;
   --color-rurikon-100: #d8d9d6;
@@ -43,14 +27,11 @@
   --color-rurikon-800: #2b2622;
   --color-rurikon-900: #1e1b17;
   --color-rurikon-950: #12100d;
-
   --color-rurikon-border: #d8d9d6b3;
 
   --font-family-sans: var(--sans), -apple-system, ui-sans-serif, system-ui,
-    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-    'Noto Color Emoji';
-  --font-family-serif: var(--serif), ui-serif, Georgia, Cambria,
-    'Times New Roman', Times, serif;
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-family-serif: var(--serif), ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   --font-family-mono: var(--mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
     Consolas, 'Liberation Mono', 'Courier New', monospace;
   --font-family-zh: var(--sans), -apple-system, ui-sans-serif, system-ui,
@@ -63,10 +44,10 @@
 :root {
   --background: #f9f4ed;
   --sans-variation: 'opsz' 32;
-  --font-features: 'cpsp' 1, 'cv01', 'cv03', 'cv04', 'calt', 'ss03',
-    'liga', 'ordn';
+  --font-features: 'cpsp' 1, 'cv01', 'cv03', 'cv04', 'calt', 'ss03', 'liga', 'ordn';
 }
 
+/* Base */
 html {
   font-size: clamp(13.5px, 0.9vw + 10px, 19px);
 }
@@ -74,147 +55,24 @@ html {
 body {
   font-synthesis: none;
   font-family: var(--sans), system-ui, -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
-    sans-serif;
+    'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-feature-settings: var(--font-features);
   font-variation-settings: 'wght' 440, var(--sans-variation);
   font-variant: common-ligatures contextual;
+  font-optical-sizing: auto;
   text-decoration-skip-ink: auto;
   text-spacing-trim: space-first;
-  font-optical-sizing: auto;
-  letter-spacing: 0.005em;
-  word-spacing: -0.02em;
-  background-color: var(--background);
   text-rendering: geometricPrecision;
   text-autospace: normal;
+  letter-spacing: 0.005em;
+  word-spacing: -0.02em;
   line-height: clamp(1.45em, calc(1.45em + 0.22vw), 1.65em);
+  background-color: var(--background);
 }
 
-i,
- em,
- blockquote,
- nav,
- .sidenote,
- .font-serif {
-  font-family: var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-variant-ligatures: contextual;
-  letter-spacing: -0.003em;
-  line-height: 1.5;
-}
-
-/* EB Garamond italic for specific elements only */
-.eb-garamond-italic {
-  font-family: 'EB Garamond', var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif !important;
-  font-style: italic !important;
-}
-
-/* Make title bold */
-h1.eb-garamond-italic {
-  font-weight: 800 !important;
-}
-
-
-/* Ensure phonetic text is fully italic */
-.text-rurikon-300.italic {
-  font-style: italic !important;
-  font-family: var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif !important;
-}
-
-/* Zen-inspired sequential text animation with fade-in */
-@keyframes zenFocus {
-  0% {
-    filter: blur(4px);
-    opacity: 0;
-    transform: scale(0.98);
-  }
-  50% {
-    filter: blur(1px);
-    opacity: 0.6;
-    transform: scale(0.99);
-  }
-  100% {
-    filter: blur(0px);
-    opacity: 1;
-    transform: scale(1.0);
-  }
-}
-
-.zen-text-part {
-  animation: zenFocus 0.4s ease-out forwards;
-  filter: blur(4px);
-  opacity: 0;
-  transform: scale(0.98);
-}
-
-.zen-text-part:nth-child(1) { animation-delay: 0.1s; } /* Hi, */
-.zen-text-part:nth-child(2) { animation-delay: 0.3s; } /* I'm */
-.zen-text-part:nth-child(3) { animation-delay: 0.5s; } /* Max */
-.zen-text-part:nth-child(4) { animation-delay: 0.7s; } /* Harari */
-
-/* Special period animation - like drawing a dot */
-@keyframes drawDot {
-  0% {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.zen-period-dot {
-  animation: drawDot 0.5s ease-out forwards;
-  animation-delay: 2.4s; /* Wait for content to finish + 0.75 seconds */
-  opacity: 0;
-  transform: scale(0.5);
-}
-
-/* Zen content fade-in animation - word by word */
-@keyframes wordFadeIn {
-  0% {
-    filter: blur(4px);
-    opacity: 0;
-  }
-  100% {
-    filter: blur(0px);
-    opacity: 1;
-  }
-}
-
-.zen-word {
-  animation: wordFadeIn 1s ease-out forwards;
-  filter: blur(4px);
-  opacity: 0;
-  display: inline-block;
-}
-
-/* Skip animations on client-side navigation */
-.skip-animations .zen-text-part,
-.skip-animations .zen-period-dot,
-.skip-animations .zen-word {
-  animation: none !important;
-  filter: none !important;
-  opacity: 1 !important;
-  transform: none !important;
-}
-
-/* Timeline-specific animation control */
-.timeline-animation-seen .zen-timeline-entry {
-  animation: none !important;
-  filter: none !important;
-  opacity: 1 !important;
-  transform: none !important;
-}
-
-del {
-  text-decoration-thickness: 1px;
-}
-
-blockquote + blockquote {
-  display: flow-root;
+*::selection {
+  background: #95a5ac40;
+  color: #485a74;
 }
 
 main {
@@ -224,7 +82,207 @@ main {
   text-wrap: pretty;
 }
 
+del { text-decoration-thickness: 1px; }
+blockquote + blockquote { display: flow-root; }
+
+/* Typography */
+h1 {
+  font-size: clamp(2rem, 5.2vw, 4.5rem);
+  line-height: clamp(1.05em, calc(1.05em + 0.2vw), 1.15em);
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: clamp(1.25rem, 2vw, 2.25rem);
+  font-variation-settings: 'wght' 400, var(--sans-variation);
+  line-height: clamp(1.15em, calc(1.15em + 0.15vw), 1.25em);
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: clamp(1.05rem, 1.5vw, 1.5rem);
+  line-height: clamp(1.2em, calc(1.2em + 0.15vw), 1.3em);
+  letter-spacing: -0.005em;
+}
+
+i, em, blockquote, nav, .sidenote, .font-serif {
+  font-family: var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-variant-ligatures: contextual;
+  letter-spacing: -0.003em;
+  line-height: 1.5;
+}
+
+.font-serif {
+  font-family: var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif;
+  font-optical-sizing: auto;
+  font-variation-settings: 'wght' 400;
+  letter-spacing: -0.005em;
+}
+
+.font-serif.font-light {
+  font-variation-settings: 'wght' 300;
+  letter-spacing: -0.008em;
+}
+
+.font-serif.font-medium {
+  font-variation-settings: 'wght' 500;
+}
+
+.eb-garamond-italic {
+  font-family: 'EB Garamond', var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif !important;
+  font-style: italic !important;
+}
+
+h1.eb-garamond-italic {
+  font-weight: 800 !important;
+}
+
+.text-rurikon-300.italic {
+  font-style: italic !important;
+  font-family: var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif !important;
+}
+
+/* Keyframes */
+@keyframes textBlurIn {
+  0% { filter: blur(4px); opacity: 0; transform: scale(0.98); }
+  50% { filter: blur(1px); opacity: 0.6; transform: scale(0.99); }
+  100% { filter: blur(0px); opacity: 1; transform: scale(1.0); }
+}
+
+@keyframes textFadeIn {
+  0% { filter: blur(4px); opacity: 0; }
+  100% { filter: blur(0px); opacity: 1; }
+}
+
+@keyframes dotScale {
+  0% { opacity: 0; transform: scale(0.5); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes timelineBlurIn {
+  0% { filter: blur(8px); opacity: 0; }
+  50% { filter: blur(1px); opacity: 0.6; }
+  100% { filter: blur(0px); opacity: 1; }
+}
+
+@keyframes hide {
+  0% { opacity: 1; filter: blur(0); }
+  100% { opacity: 0; filter: blur(4px); }
+}
+
+@keyframes appear {
+  0% { opacity: 0; filter: blur(4px); }
+  100% { opacity: 1; filter: blur(0); }
+}
+
+@keyframes floatUp {
+  0% { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 0.9; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; transform: scale(0.95) translateY(-10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Animations */
+.stagger-title {
+  animation: textBlurIn 0.4s ease-out forwards;
+  filter: blur(4px);
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.stagger-title:nth-child(1) { animation-delay: 0.1s; }
+.stagger-title:nth-child(2) { animation-delay: 0.3s; }
+.stagger-title:nth-child(3) { animation-delay: 0.5s; }
+.stagger-title:nth-child(4) { animation-delay: 0.7s; }
+
+.stagger-dot {
+  animation: dotScale 0.5s ease-out forwards;
+  animation-delay: 2.4s;
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.stagger-word {
+  animation: textFadeIn 1s ease-out forwards;
+  filter: blur(4px);
+  opacity: 0;
+  display: inline-block;
+}
+
+.stagger-timeline-entry {
+  animation: timelineBlurIn 0.5s ease-out forwards;
+  filter: blur(5px);
+  opacity: 0;
+  will-change: filter, opacity;
+}
+
+.skip-animations .stagger-title,
+.skip-animations .stagger-dot,
+.skip-animations .stagger-word {
+  animation: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.timeline-animation-seen .stagger-timeline-entry {
+  animation: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+@supports (view-transition-name: none) {
+  @media not (prefers-reduced-motion: reduce) {
+    ::view-transition-old(crossfade) {
+      animation: hide 0.16s cubic-bezier(0.6, 0, 0.8, 1) forwards;
+    }
+    ::view-transition-new(crossfade) {
+      opacity: 0;
+      animation: appear .18s ease 0s forwards;
+    }
+  }
+}
+
+/* Code */
+code {
+  font-family: var(--mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, 'Liberation Mono', 'Courier New', monospace;
+  word-spacing: -0.15em;
+  background: transparent;
+  --shiki-token-comment: hsl(30deg 8% 48% / 0.65);
+  --shiki-token-punctuation: hsl(30deg 6% 44% / 0.75);
+  --shiki-token-operator: hsl(30deg 8% 44% / 0.8);
+  --shiki-token-variable: hsl(30deg 12% 46%);
+  --shiki-token-parameter: hsl(30deg 15% 48%);
+  --shiki-token-constant: hsl(30deg 35% 48%);
+  --shiki-token-number: hsl(30deg 35% 48%);
+  --shiki-token-escape: hsl(30deg 30% 48%);
+  --shiki-token-keyword: hsl(25deg 30% 48%);
+  --shiki-token-type: hsl(25deg 25% 48%);
+  --shiki-token-function: hsl(180deg 25% 46%);
+  --shiki-token-link: hsl(180deg 25% 46%);
+  --shiki-token-property: hsl(180deg 20% 46%);
+  --shiki-token-string: hsl(150deg 20% 44%);
+  --shiki-token-string-expression: hsl(150deg 20% 44%);
+  --shiki-token-regex: hsl(150deg 22% 45%);
+  --shiki-token-class-name: hsl(20deg 18% 48%);
+}
+
+code span { transition: color 0.2s; }
+
 pre {
+  --shiki-foreground: #3a3531;
+  --shiki-background: transparent;
   background-color: #fafaf8;
   border: 1px solid #e8e7e3;
   border-radius: 6px;
@@ -252,264 +310,76 @@ pre code {
   }
 }
 
-code {
-  font-family: var(--mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
-    Consolas, 'Liberation Mono', 'Courier New', monospace;
-  word-spacing: -0.15em;
-  background: transparent;
-
-  /* Cohesive warm palette aligned with rurikon aesthetic - limited, harmonious colors */
-  /* Base warm brown tones for structure */
-  --shiki-token-comment: hsl(30deg 8% 48% / 0.65);
-  --shiki-token-punctuation: hsl(30deg 6% 44% / 0.75);
-  --shiki-token-operator: hsl(30deg 8% 44% / 0.8);
-  --shiki-token-variable: hsl(30deg 12% 46%);
-  --shiki-token-parameter: hsl(30deg 15% 48%);
-  
-  /* Warm amber/orange for values and constants */
-  --shiki-token-constant: hsl(30deg 35% 48%);
-  --shiki-token-number: hsl(30deg 35% 48%);
-  --shiki-token-escape: hsl(30deg 30% 48%);
-  
-  /* Warm brown-orange for keywords and control flow */
-  --shiki-token-keyword: hsl(25deg 30% 48%);
-  --shiki-token-type: hsl(25deg 25% 48%);
-  
-  /* Muted warm teal for functions and callable entities */
-  --shiki-token-function: hsl(180deg 25% 46%);
-  --shiki-token-link: hsl(180deg 25% 46%);
-  --shiki-token-property: hsl(180deg 20% 46%);
-  
-  /* Muted warm green for strings */
-  --shiki-token-string: hsl(150deg 20% 44%);
-  --shiki-token-string-expression: hsl(150deg 20% 44%);
-  --shiki-token-regex: hsl(150deg 22% 45%);
-  
-  /* Warm brown-purple for types and classes */
-  --shiki-token-class-name: hsl(20deg 18% 48%);
-}
-
-pre {
-  --shiki-foreground: #3a3531;
-  --shiki-background: transparent;
-}
-
-code span {
-  transition: color 0.2s;
-}
-
+/* Article */
 article {
   figure {
     margin-top: 2.25rem;
     line-height: 0;
   }
-  /* Prefer balanced, prettier wrapping for intro summaries */
-  .about-intro-balance {
-    text-wrap: balance;
-  }
+
+  .about-intro-balance { text-wrap: balance; }
+
   .sidenote-content {
-    img,
-    video,
-    pre {
-      margin: 0;
-    }
+    img, video, pre { margin: 0; }
   }
-  .framed > img, .framed > figure > span:first-child {
+
+  .framed > img,
+  .framed > figure > span:first-child {
     padding: var(--frame-padding, 1.125rem);
     background: var(--frame-background, #fff);
     border: 1px solid var(--color-rurikon-border);
   }
+
   iframe {
     width: 100%;
     border: 1px solid var(--color-rurikon-border);
     background-color: #fff;
   }
+
   details {
     margin-top: 2.25rem;
     padding: 0.65rem 0;
     border-top: 1px solid var(--color-rurikon-border);
     border-bottom: 1px solid var(--color-rurikon-border);
   }
+
   details summary {
     font-variation-settings: 'wght' 600, var(--sans-variation);
     margin-bottom: 0.35rem;
   }
-  details summary::marker {
-    content: '';
-  }
-  details p:first-of-type {
-    margin-top: 0;
-  }
+
+  details summary::marker { content: ''; }
+  details p:first-of-type { margin-top: 0; }
 }
 
-.content-fade-out {
-  background: linear-gradient(to bottom, #fcfcfc, #fcfcfc00);
-}
-
-*::selection {
-  background: #95a5ac40;
-  color: #485a74;
-}
-
-.dot-leaders {
-  text-align: end;
-  height: 1em;
-  overflow: hidden;
-  word-wrap: break-word;
-  letter-spacing: 6px;
-}
-
-.dot-leaders::after {
-  content: '······································································';
-}
-
-@supports (view-transition-name: none) {
-  @media not (prefers-reduced-motion: reduce) {
-    ::view-transition-old(crossfade) {
-      animation: hide 0.16s cubic-bezier(0.6, 0, 0.8, 1) forwards;
-    }
-
-    ::view-transition-new(crossfade) {
-      opacity: 0;
-      /* Remove start delay and shorten duration to avoid perceptible lag */
-      animation: appear .18s ease 0s forwards;
-    }
-  }
-}
-
-@keyframes hide {
-  0% {
-    opacity: 1;
-    filter: blur(0);
-  }
-  100% {
-    opacity: 0;
-    filter: blur(4px);
-  }
-}
-
-@keyframes appear {
-  0% {
-    opacity: 0;
-    filter: blur(4px);
-  }
-  100% {
-    opacity: 1;
-    filter: blur(0);
-  }
-}
-
-/* Enhanced typography hierarchy */
-h1 {
-  letter-spacing: -0.02em;
-  line-height: clamp(1.05em, calc(1.05em + 0.2vw), 1.15em);
-  font-size: clamp(2rem, 5.2vw, 4.5rem);
-}
-
-h2 {
-  font-variation-settings: 'wght' 400, var(--sans-variation);
-  letter-spacing: -0.01em;
-  line-height: clamp(1.15em, calc(1.15em + 0.15vw), 1.25em);
-  font-size: clamp(1.25rem, 2vw, 2.25rem);
-}
-
-/* Add h3 fluid typography */
-h3 {
-  letter-spacing: -0.005em;
-  line-height: clamp(1.2em, calc(1.2em + 0.15vw), 1.3em);
-  font-size: clamp(1.05rem, 1.5vw, 1.5rem);
-}
-
-/* Utility to keep punctuation glued to the preceding word */
-.nowrap-group {
-  white-space: nowrap;
-}
-
-/* Sophisticated serif styling inspired by zen browser */
-.font-serif {
-  font-family: var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif;
-  font-optical-sizing: auto;
-  font-variation-settings: 'wght' 400;
-  letter-spacing: -0.005em;
-}
-
-.font-serif.font-light {
-  font-variation-settings: 'wght' 300;
-  letter-spacing: -0.008em;
-}
-
-.font-serif.font-medium {
-  font-variation-settings: 'wght' 500;
-}
-
-/* Improved spacing and breathing room */
-.space-y-6 > * + * {
-  margin-top: 2.5rem;
-}
-
-.space-y-8 > * + * {
-  margin-top: 3rem;
-}
-
-/* Subtle artistic touches */
-.underline {
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
-  transition: all 0.2s ease;
-}
-
-.underline:hover {
-  text-decoration-thickness: 2px;
-}
-
-/* Enhanced link styling with calm hover effects */
-a {
-  transition: color 0.3s ease;
-  position: relative;
-}
-
-/* Content link hover color (not nav links) */
-main a:hover {
-  color: #B85252;
-  text-decoration-color: #B85252;
-}
-
-/* Thoughts list hover - apply to child spans */
-main a:hover span {
-  color: #B85252;
-}
-
-/* Thought articles: reduce sans/body paragraphs and list items slightly */
 article .thought-article .article-p,
 article .thought-article li {
-  font-size: 0.8em; /* slightly reduce sans body size */
+  font-size: 0.8em;
 }
 
-/* Keep serif-styled elements (intro italics, quotes) at original visual size */
 article .thought-article em,
 article .thought-article i,
 article .thought-article .font-serif,
 article .thought-article blockquote {
-  font-size: 1.05em; /* Subtle size increase for emphasis without overwhelming */
+  font-size: 1.05em;
 }
 
-/* Keep fully-italic (serif) intro paragraphs at normal size */
-/* Keep the article paragraph sizing simple and uniform */
-
-/* Sub-headings within articles scale down subtly relative to global */
 article .thought-article h2 {
   font-size: clamp(1.35rem, 1.9vw, 2.1rem);
 }
+
 article .thought-article h3 {
   font-size: clamp(1.15rem, 1.4vw, 1.35rem);
 }
 
-/* Whoami intro paragraph spacing */
-.whoami-intro {
-  margin-bottom: 2.5rem;
+/* Whoami */
+.whoami-header {
+  max-width: 66ch;
+  margin-bottom: 3rem;
 }
 
-/* Whoami section titles - subtle visual hierarchy */
+.whoami-intro { margin-bottom: 2.5rem; }
+
 .whoami-section-title {
   font-size: clamp(1.75rem, 2.4vw, 2.1rem);
   font-weight: 500;
@@ -521,64 +391,46 @@ article .thought-article h3 {
   border-top: 1px solid rgba(107, 114, 128, 0.15);
 }
 
-/* First section title should not have top border */
 .whoami-section-title:first-of-type {
   border-top: none;
   margin-top: 1.5rem;
   padding-top: 0;
 }
 
-/* Remove top margin from H2 elements immediately following section titles */
-.whoami-section-title + h2 {
-  margin-top: 0;
-}
+.whoami-section-title + h2 { margin-top: 0; }
 
-/* Reduce spacing between whoami section items */
 .whoami-section-title ~ h2 {
   margin-top: 1.5rem;
   margin-bottom: 1rem;
   font-size: clamp(1.45rem, 2.3vw, 2.5rem);
 }
 
-@keyframes floatUp {
-  0% {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  100% {
-    opacity: 0.9;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fade-in {
-  0% {
-    opacity: 0;
-    transform: scale(0.95) translateY(-10px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.3s ease-out forwards;
-}
-
-/* Whoami Header */
-.whoami-header {
-  max-width: 66ch;
-  margin-bottom: 3rem;
-}
-
 @media (min-width: 480px) {
-  .whoami-header {
-    max-width: min(66ch, 50vw);
-  }
+  .whoami-header { max-width: min(66ch, 50vw); }
 }
 
-/* Timeline wrapper with sticky year */
+/* Links */
+a {
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+main a:hover {
+  color: #B85252;
+  text-decoration-color: #B85252;
+}
+
+main a:hover span { color: #B85252; }
+
+.underline {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition: all 0.2s ease;
+}
+
+.underline:hover { text-decoration-thickness: 2px; }
+
+/* Timeline */
 .timeline-wrapper {
   position: relative;
   max-width: 66ch;
@@ -590,24 +442,23 @@ article .thought-article h3 {
   --timeline-column-width: calc(100% - var(--timeline-axis) - var(--timeline-branch-gap));
 }
 
-@media (min-width: 480px) {
-  .timeline-wrapper {
-    max-width: min(66ch, 90vw);
-  }
+.timeline {
+  position: relative;
+  padding: 0 0 4rem;
+  isolation: isolate;
+  width: 100%;
 }
 
-@media (max-width: 900px) {
-  .timeline-wrapper {
-    --timeline-axis: 46%;
-    --timeline-branch-gap: 1.25rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .timeline-wrapper {
-    --timeline-axis: 50%;
-    --timeline-branch-gap: 1rem;
-  }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 2rem;
+  width: 1px;
+  background: transparent;
+  opacity: 0;
+  z-index: 0;
 }
 
 .sticky-year-indicator {
@@ -633,8 +484,6 @@ article .thought-article h3 {
   transform: translateX(-50%);
 }
 
-
-/* Odometer effect for last digit */
 .year-odometer {
   display: inline-flex;
   overflow: hidden;
@@ -657,27 +506,6 @@ article .thought-article h3 {
   flex-shrink: 0;
 }
 
-/* Timeline - minimal and thoughtful */
-.timeline {
-  position: relative;
-  padding: 0 0 4rem;
-  isolation: isolate;
-  width: 100%;
-}
-
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 2rem;
-  width: 1px;
-  background: transparent;
-  opacity: 0;
-  z-index: 0;
-}
-
-/* Binary line display - left of center for alternating layout */
 .binary-line {
   position: absolute;
   left: var(--timeline-axis);
@@ -705,7 +533,6 @@ article .thought-article h3 {
   transition: color 0.2s ease-out;
 }
 
-/* Top fade gradient - covers top area when year is sticky */
 .timeline-fade-top {
   position: sticky;
   top: -4rem;
@@ -716,22 +543,14 @@ article .thought-article h3 {
   height: 14rem;
   margin-bottom: -8rem;
   padding-top: 4rem;
-  background: linear-gradient(
-    to bottom,
-    var(--background) 0%,
-    var(--background) 25%,
-    rgba(249, 244, 237, 0.95) 40%,
-    rgba(249, 244, 237, 0.7) 60%,
-    rgba(249, 244, 237, 0.3) 80%,
-    rgba(249, 244, 237, 0) 100%
-  );
+  background: linear-gradient(to bottom,
+    var(--background) 0%, var(--background) 25%,
+    rgba(249, 244, 237, 0.95) 40%, rgba(249, 244, 237, 0.7) 60%,
+    rgba(249, 244, 237, 0.3) 80%, rgba(249, 244, 237, 0) 100%);
   pointer-events: none;
   z-index: 9;
 }
 
-/* Bottom fade gradient - sticky at viewport bottom */
-/* Height increased significantly to account for parallax effect (binary line moves at 0.6x speed) */
-/* The binary line extends further down due to parallax, so gradient needs extra coverage */
 .timeline-fade-bottom {
   position: sticky;
   bottom: 0;
@@ -740,15 +559,10 @@ article .thought-article h3 {
   width: calc(100% + 3rem);
   height: 28rem;
   margin-top: -14rem;
-  background: linear-gradient(
-    to top,
-    var(--background) 0%,
-    rgba(249, 244, 237, 0.95) 8%,
-    rgba(249, 244, 237, 0.75) 25%,
-    rgba(249, 244, 237, 0.4) 50%,
-    rgba(249, 244, 237, 0.1) 75%,
-    rgba(249, 244, 237, 0) 100%
-  );
+  background: linear-gradient(to top,
+    var(--background) 0%, rgba(249, 244, 237, 0.95) 8%,
+    rgba(249, 244, 237, 0.75) 25%, rgba(249, 244, 237, 0.4) 50%,
+    rgba(249, 244, 237, 0.1) 75%, rgba(249, 244, 237, 0) 100%);
   pointer-events: none;
   z-index: 9;
 }
@@ -781,20 +595,17 @@ article .thought-article h3 {
   margin-bottom: 2.5rem;
 }
 
-/* Odd entries on the right side */
 .timeline-entry:nth-child(odd of .timeline-entry) {
   padding-left: calc(var(--timeline-axis) + var(--timeline-branch-gap));
   justify-content: flex-start;
 }
 
-/* Even entries on the left side */
 .timeline-entry:nth-child(even of .timeline-entry) {
   padding-right: calc((100% - var(--timeline-axis)) + var(--timeline-branch-gap));
   justify-content: flex-end;
   flex-direction: row-reverse;
 }
 
-/* CSS-drawn connector lines */
 .entry-connector {
   position: relative;
   width: 2.5rem;
@@ -805,7 +616,6 @@ article .thought-article h3 {
   margin-top: 2rem;
 }
 
-/* Right-side entries (odd) - line slants down-right toward timeline */
 .timeline-entry:nth-child(odd of .timeline-entry) .entry-connector {
   margin-right: 0.5rem;
   transform: rotate(45deg);
@@ -824,7 +634,6 @@ article .thought-article h3 {
   transform-origin: right center;
 }
 
-/* Left-side entries (even) - line slants down-left toward timeline */
 .timeline-entry:nth-child(even of .timeline-entry) .entry-connector {
   margin-right: -0.5rem;
   transform: rotate(-45deg);
@@ -849,10 +658,6 @@ article .thought-article h3 {
 
 .timeline-entry:nth-child(odd of .timeline-entry) .entry-content {
   max-width: var(--timeline-column-width);
-}
-
-/* Text alignment for alternating entries */
-.timeline-entry:nth-child(odd of .timeline-entry) .entry-content {
   text-align: left;
 }
 
@@ -890,17 +695,25 @@ article .thought-article h3 {
   color: var(--color-rurikon-700);
 }
 
-.entry-content p:last-child {
-  margin-bottom: 0;
+.entry-content p:last-child { margin-bottom: 0; }
+
+@media (min-width: 480px) {
+  .timeline-wrapper { max-width: min(66ch, 90vw); }
 }
 
-/* Responsive - Mobile */
+@media (max-width: 900px) {
+  .timeline-wrapper {
+    --timeline-axis: 46%;
+    --timeline-branch-gap: 1.25rem;
+  }
+}
+
 @media (max-width: 768px) {
   .timeline-wrapper {
     max-width: 100%;
     --timeline-column-width: 100%;
   }
-  
+
   .timeline-fade-top {
     top: 0;
     margin-left: 0;
@@ -911,38 +724,28 @@ article .thought-article h3 {
     margin-left: 0;
     width: 100%;
   }
-  
+
   .sticky-year-indicator {
     top: 0.25rem;
     font-size: 0.85rem;
     padding: 0.2rem 0.4rem;
     z-index: 40;
   }
-  
-  
-  .year-odometer {
-    height: 1em;
-    line-height: 1;
-  }
-  
+
+  .year-odometer,
   .odometer-digit {
     height: 1em;
     line-height: 1;
   }
 
-  .timeline {
-    padding: 0 0 4rem;
-  }
-  
-  .timeline::before {
-    bottom: 2rem;
-  }
+  .timeline { padding: 0 0 4rem; }
+  .timeline::before { bottom: 2rem; }
 
   .timeline-entry {
     margin-bottom: 2rem;
     padding-left: 0;
   }
-  
+
   .timeline-entry:nth-child(odd of .timeline-entry) .entry-connector {
     margin-right: 0.5rem;
   }
@@ -953,28 +756,27 @@ article .thought-article h3 {
   }
 }
 
-/* Zen timeline entry animation - subtle blur to focus */
-@keyframes zenEntryFocus {
-  0% {
-    filter: blur(8px);
-    opacity: 0;
-  }
-  50% {
-    filter: blur(1px);
-    opacity: 0.6;
-  }
-  100% {
-    filter: blur(0px);
-    opacity: 1;
+@media (max-width: 640px) {
+  .timeline-wrapper {
+    --timeline-axis: 50%;
+    --timeline-branch-gap: 1rem;
   }
 }
 
-.zen-timeline-entry {
-  animation: zenEntryFocus 0.5s ease-out forwards;
-  filter: blur(5px);
-  opacity: 0;
-  will-change: filter, opacity;
+/* Utilities */
+.nowrap-group { white-space: nowrap; }
+.space-y-6 > * + * { margin-top: 2.5rem; }
+.space-y-8 > * + * { margin-top: 3rem; }
+.content-fade-out { background: linear-gradient(to bottom, #fcfcfc, #fcfcfc00); }
+
+.dot-leaders {
+  text-align: end;
+  height: 1em;
+  overflow: hidden;
+  word-wrap: break-word;
+  letter-spacing: 6px;
 }
 
-/* Staggered delays for timeline entries - sequential appearance */
-/* Animation delays are now set via inline styles for maximum reliability */
+.dot-leaders::after {
+  content: '······································································';
+}

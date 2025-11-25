@@ -17,7 +17,7 @@ function renderBodyPart(part: TimelineBodyPart, index: number) {
 export function TimelineEntry({ entry }: { entry: TimelineEntryData }) {
   return (
     <div
-      className='timeline-entry zen-timeline-entry'
+      className='timeline-entry stagger-timeline-entry'
       style={{ animationDelay: `${entry.delay}s` }}
       data-year={entry.year}
     >
