@@ -5,6 +5,7 @@ Personal portfolio and blog. Live at [maxhax.dev](https://maxhax.dev).
 ## Stack
 
 - **Framework:** Next.js 15 (App Router)
+- **Language:** TypeScript
 - **Styling:** Tailwind CSS v4
 - **Content:** MDX + Shiki
 - **Email:** Resend
@@ -12,7 +13,7 @@ Personal portfolio and blog. Live at [maxhax.dev](https://maxhax.dev).
 
 ## Setup
 
-Requires Node.js 18+ and pnpm.
+Requires Node.js 18.18+ and pnpm.
 
 ```bash
 pnpm install
