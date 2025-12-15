@@ -22,7 +22,7 @@ importers:
         version: 2.0.13
       '@vercel/analytics':
         specifier: ^1.6.1
-        version: 1.6.1(next@15.4.8(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)
+        version: 1.6.1(next@15.4.10(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -30,8 +30,8 @@ importers:
         specifier: ^0.16.25
         version: 0.16.27
       next:
-        specifier: 15.4.8
-        version: 15.4.8(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        specifier: 15.4.10
+        version: 15.4.10(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react:
         specifier: 18.2.0
         version: 18.2.0
@@ -379,8 +379,8 @@ packages:
       '@types/react': '>=16'
       react: '>=16'
 
-  '@next/env@15.4.8':
-    resolution: {integrity: sha512-LydLa2MDI1NMrOFSkO54mTc8iIHSttj6R6dthITky9ylXV2gCGi0bHQjVCtLGRshdRPjyh2kXbxJukDtBWQZtQ==}
+  '@next/env@15.4.10':
+    resolution: {integrity: sha512-knhmoJ0Vv7VRf6pZEPSnciUG1S4bIhWx+qTYBW/AjxEtlzsiNORPk8sFDCEvqLfmKuey56UB9FL1UdHEV3uBrg==}
 
   '@next/eslint-plugin-next@16.0.7':
     resolution: {integrity: sha512-hFrTNZcMEG+k7qxVxZJq3F32Kms130FAhG8lvw2zkKBgAcNOJIxlljNiCjGygvBshvaGBdf88q2CqWtnqezDHA==}
@@ -1765,8 +1765,8 @@ packages:
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
-  next@15.4.8:
-    resolution: {integrity: sha512-jwOXTz/bo0Pvlf20FSb6VXVeWRssA2vbvq9SdrOPEg9x8E1B27C2rQtvriAn600o9hH61kjrVRexEffv3JybuA==}
+  next@15.4.10:
+    resolution: {integrity: sha512-itVlc79QjpKMFMRhP+kbGKaSG/gZM6RCvwhEbwmCNF06CdDiNaoHcbeg0PqkEa2GOcn8KJ0nnc7+yL7EjoYLHQ==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
     hasBin: true
     peerDependencies:
@@ -2643,7 +2643,7 @@ snapshots:
       '@types/react': 19.2.7
       react: 18.2.0
 
-  '@next/env@15.4.8': {}
+  '@next/env@15.4.10': {}
 
   '@next/eslint-plugin-next@16.0.7':
     dependencies:
@@ -2938,9 +2938,9 @@ snapshots:
 
   '@ungap/structured-clone@1.3.0': {}
 
-  '@vercel/analytics@1.6.1(next@15.4.8(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)':
+  '@vercel/analytics@1.6.1(next@15.4.10(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)':
     optionalDependencies:
-      next: 15.4.8(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      next: 15.4.10(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react: 18.2.0
 
   '@vue/compiler-core@3.5.25':
@@ -4386,9 +4386,9 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  next@15.4.8(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
+  next@15.4.10(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
-      '@next/env': 15.4.8
+      '@next/env': 15.4.10
       '@swc/helpers': 0.5.15
       caniuse-lite: 1.0.30001759
       postcss: 8.4.31
