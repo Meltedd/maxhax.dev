@@ -178,7 +178,7 @@ export function ContactForm() {
         />
 
         <div className="px-[clamp(0.75rem,2vw,1rem)] py-[clamp(0.25rem,0.8vw,0.375rem)] flex items-center justify-between border-t border-rurikon-border gap-[clamp(0.5rem,1.5vw,0.75rem)]">
-          <div id="message-length" className="text-[clamp(0.85rem,1.5vw,1rem)] text-rurikon-300 font-serif italic" aria-live="polite">
+          <div id="message-length" className="text-[clamp(0.85rem,1.5vw,1rem)] text-rurikon-300 font-serif italic">
             {message.length} characters
           </div>
 
