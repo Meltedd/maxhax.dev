@@ -3,8 +3,15 @@
 import { useEffect, useState, useRef } from 'react'
 import { useLatest } from '@/hooks/useLatest'
 
-interface TimelineWrapperProps { children: React.ReactNode }
-interface SectionInfo { year: string; start: number; end: number }
+interface TimelineWrapperProps {
+  children: React.ReactNode
+}
+
+interface SectionInfo {
+  year: string
+  start: number
+  end: number
+}
 
 const TRANSITION_START_RATIO = 0.4
 const SCROLL_SNAP = 50
@@ -77,6 +84,14 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
   const [yearState, setYearState] = useState({ current: '', next: '', progress: 0 })
   const [hasSeenAnimation, setHasSeenAnimation] = useState(false)
 
+  // Only triggers a render when values actually change
+  const setYearIfChanged = (current: string, next: string, progress: number) => {
+    setYearState(prev => {
+      if (prev.current === current && prev.next === next && prev.progress === progress) return prev
+      return { current, next, progress }
+    })
+  }
+
   // DOM refs
   const timelineRef = useRef<HTMLDivElement>(null)
   const stickyRef = useRef<HTMLDivElement>(null)
@@ -104,7 +119,6 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
 
   // Session storage: read on mount, write after animation
   useEffect(() => {
-    if (typeof window === 'undefined') return
     try {
       if (sessionStorage.getItem('timelineSeen') === 'true') {
         setHasSeenAnimation(true)
@@ -152,7 +166,7 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
     const maxScrollPos = docHeight + stickyOffset
 
     if (scrollPos <= sections[0].start) {
-      setYearState({ current: sections[0].year, next: sections[0].year, progress: 0 })
+      setYearIfChanged(sections[0].year, sections[0].year, 0)
       return
     }
 
@@ -165,23 +179,23 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
         const end = isLast ? Math.min(next.start, maxScrollPos) : next.start
         const range = end - curr.start
         if (range <= 1) {
-          setYearState({ current: curr.year, next: next.year, progress: 1 })
+          setYearIfChanged(curr.year, next.year, 1)
           return
         }
         const ratio = isLast ? 0 : TRANSITION_START_RATIO
         const transitionStart = curr.start + range * ratio
         if (scrollPos < transitionStart) {
-          setYearState({ current: curr.year, next: curr.year, progress: 0 })
+          setYearIfChanged(curr.year, curr.year, 0)
           return
         }
         const progress = Math.min(Math.max((scrollPos - transitionStart) / Math.max(range * (1 - ratio), 1), 0), 1)
-        setYearState({ current: curr.year, next: next.year, progress })
+        setYearIfChanged(curr.year, next.year, progress)
         return
       }
     }
 
     const last = sections[sections.length - 1]
-    setYearState({ current: last.year, next: last.year, progress: 0 })
+    setYearIfChanged(last.year, last.year, 0)
   }
 
   // Update binary spans directly — no React render needed for this decorative element
@@ -257,8 +271,6 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
 
   // Calculate number of digits and setup scroll listeners
   useEffect(() => {
-    if (typeof window === 'undefined') return
-
     const syncSpans = () => {
       const container = binaryLineRef.current
       if (!container) return
@@ -324,7 +336,7 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
       updateMeasurementsRef.current()
       const { sections } = scrollStateRef.current
       if (sections.length > 0) {
-        setYearState({ current: sections[0].year, next: sections[1]?.year ?? sections[0].year, progress: 0 })
+        setYearIfChanged(sections[0].year, sections[1]?.year ?? sections[0].year, 0)
       }
       updateFromScrollRef.current(window.scrollY, Date.now())
     })
