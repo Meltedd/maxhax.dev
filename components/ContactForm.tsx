@@ -63,7 +63,6 @@ export function ContactForm() {
               name="email"
               autoComplete="email"
               required
-              aria-label="Your email address"
             />
             <nav aria-label="Social links" className="flex items-center gap-[clamp(0.5rem,1.5vw,0.75rem)] text-rurikon-300 text-[clamp(0.85rem,1.5vw,0.96rem)] shrink-0">
               <a
@@ -122,7 +121,6 @@ export function ContactForm() {
               name="subject"
               autoComplete="off"
               maxLength={200}
-              aria-label="Email subject"
             />
             <div className="flex items-center gap-[clamp(0.5rem,1.5vw,0.75rem)] shrink-0">
               {status === 'success' && (
@@ -172,7 +170,6 @@ export function ContactForm() {
           name="message"
           autoComplete="off"
           maxLength={MAX_MESSAGE_LENGTH}
-          aria-label="Message content"
           aria-describedby="message-length"
         />
 
@@ -183,7 +180,7 @@ export function ContactForm() {
 
           <button
             type="submit"
-            disabled={!email.trim() || !message.trim() || isPending || status === 'success'}
+            disabled={!email.trim() || !message.trim() || isPending}
             className="group text-[clamp(0.9rem,1.6vw,1rem)] text-rurikon-600 hover:text-link-hover font-serif eb-garamond-italic transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed inline-flex items-center gap-[clamp(0.2rem,0.8vw,0.25rem)]"
             aria-label={status === 'success' ? 'Message sent' : isPending ? 'Sending message' : 'Send message'}
           >

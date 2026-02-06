@@ -77,9 +77,6 @@ export const components: Record<
       {...props}
     />
   ),
-  pre: (props) => (
-    <pre {...props} />
-  ),
   code: async (props) => {
     if (typeof props.children === 'string') {
       const lang = props.className?.match(/language-(\S+)/)?.[1] || 'text'

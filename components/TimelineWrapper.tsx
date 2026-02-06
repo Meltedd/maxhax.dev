@@ -230,10 +230,8 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
     const scrollDelta = scrollY - state.lastY
 
     if (scrollDelta !== 0) {
-      const velocity = scrollDelta / timeDelta
-      const cappedVelocity = Math.sign(velocity) * Math.min(Math.abs(velocity), MAX_VELOCITY)
-      const normalizedVelocity = Math.abs(cappedVelocity) * VELOCITY_SCALE
-      state.momentum = Math.max(state.momentum, Math.min(normalizedVelocity, MAX_MOMENTUM))
+      const speed = Math.min(Math.abs(scrollDelta) / timeDelta, MAX_VELOCITY)
+      state.momentum = Math.max(state.momentum, Math.min(speed * VELOCITY_SCALE, MAX_MOMENTUM))
       callbacks.current.startDecayTail()
     }
 
