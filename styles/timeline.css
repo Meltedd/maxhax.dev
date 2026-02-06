@@ -113,8 +113,10 @@
   padding-top: 4rem;
   background: linear-gradient(to bottom,
     var(--background) 0%, var(--background) 25%,
-    rgba(249, 244, 237, 0.95) 40%, rgba(249, 244, 237, 0.7) 60%,
-    rgba(249, 244, 237, 0.3) 80%, rgba(249, 244, 237, 0) 100%);
+    color-mix(in srgb, var(--background) 95%, transparent) 40%,
+    color-mix(in srgb, var(--background) 70%, transparent) 60%,
+    color-mix(in srgb, var(--background) 30%, transparent) 80%,
+    transparent 100%);
   pointer-events: none;
   z-index: 9;
 }
@@ -128,9 +130,12 @@
   height: 28rem;
   margin-top: -14rem;
   background: linear-gradient(to top,
-    var(--background) 0%, rgba(249, 244, 237, 0.95) 8%,
-    rgba(249, 244, 237, 0.75) 25%, rgba(249, 244, 237, 0.4) 50%,
-    rgba(249, 244, 237, 0.1) 75%, rgba(249, 244, 237, 0) 100%);
+    var(--background) 0%,
+    color-mix(in srgb, var(--background) 95%, transparent) 8%,
+    color-mix(in srgb, var(--background) 75%, transparent) 25%,
+    color-mix(in srgb, var(--background) 40%, transparent) 50%,
+    color-mix(in srgb, var(--background) 10%, transparent) 75%,
+    transparent 100%);
   pointer-events: none;
   z-index: 9;
 }
