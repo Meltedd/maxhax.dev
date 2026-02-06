@@ -31,7 +31,6 @@ const lcgHash = (value: number): number => {
   return (mixed * 1664525 + 1013904223) >>> 0
 }
 
-// Build base binary string from scroll position
 const buildBinary = (scrollPos: number, numDigits: number): string => {
   const quantized = Math.floor(scrollPos / SCROLL_SNAP) * SCROLL_SNAP
   let binary = ''
@@ -44,9 +43,7 @@ const buildBinary = (scrollPos: number, numDigits: number): string => {
 export function TimelineWrapper({ children }: TimelineWrapperProps) {
   // React-managed state (only values that affect JSX structure or text)
   const [yearState, setYearState] = useState({ current: '', next: '', progress: 0 })
-  const [hasSeenAnimation, setHasSeenAnimation] = useState(false)
 
-  // Only triggers a render when values actually change
   const setYearIfChanged = (current: string, next: string, progress: number) => {
     setYearState(prev => {
       if (prev.current === current && prev.next === next && prev.progress === progress) return prev
@@ -54,7 +51,6 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
     })
   }
 
-  // DOM refs
   const timelineRef = useRef<HTMLDivElement>(null)
   const stickyRef = useRef<HTMLDivElement>(null)
   const binaryLineRef = useRef<HTMLDivElement>(null)
@@ -79,22 +75,6 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
   const nextLastDigit = yearState.next ? parseInt(yearState.next.slice(-1)) || 0 : 0
   const digitOffset = yearState.progress * 100
 
-  // Session storage: read on mount, write after animation
-  useEffect(() => {
-    try {
-      if (sessionStorage.getItem('timelineSeen') === 'true') {
-        setHasSeenAnimation(true)
-        return
-      }
-    } catch { /* sessionStorage unavailable in some contexts */ }
-    const timeout = setTimeout(() => {
-      try { sessionStorage.setItem('timelineSeen', 'true') } catch { /* ignore */ }
-      setHasSeenAnimation(true)
-    }, 4000)
-    return () => clearTimeout(timeout)
-  }, [])
-
-  // Measure sections and update doc height
   const updateMeasurements = () => {
     if (!timelineRef.current) return
     const state = scrollStateRef.current
@@ -174,12 +154,10 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
       const center = (state.docHeight > 0 ? scrollY / state.docHeight : 0) * spans.length
       const width = 80 + state.momentum * 70
 
-      // Clean expired entries
       map.forEach((data, i) => {
         if (now - data.time >= SCRAMBLE_DURATION) map.delete(i)
       })
 
-      // Add new scrambles near scroll position
       for (let i = 0; i < spans.length; i++) {
         const dist = Math.abs(i - center)
         if (dist >= width || map.has(i)) continue
@@ -189,7 +167,6 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
         }
       }
 
-      // Write to spans, preferring scrambled values over base
       for (let i = 0; i < spans.length; i++) {
         const ch = map.get(i)?.value ?? base[i]
         if (spans[i].textContent !== ch) spans[i].textContent = ch
@@ -223,7 +200,6 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
     decayTimeoutRef.current = setTimeout(step, DECAY_DELAY)
   }
 
-  // Main scroll update pipeline
   const updateFromScroll = (scrollY: number, timestamp: number) => {
     const state = scrollStateRef.current
     const timeDelta = Math.max(timestamp - state.lastTime, 16)
@@ -276,7 +252,6 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
       const needed = Math.ceil((lastEntryBottom * (1 + buffer)) / pixelsPerDigit)
       if (needed <= 0 || needed === existingSpans.length) return
 
-      // Add or remove spans to match needed count
       if (needed > existingSpans.length) {
         for (let i = existingSpans.length; i < needed; i++) {
           const span = document.createElement('span')
@@ -330,8 +305,7 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
   }, [])
 
   return (
-    <div className={`timeline-wrapper ${hasSeenAnimation ? 'timeline-animation-seen' : ''}`}>
-      {/* Sticky year indicator with odometer effect */}
+    <div className="timeline-wrapper">
       <div className="sticky-year-indicator" ref={stickyRef}>
         <span>{yearState.current.slice(0, -1)}</span>
         <span className="year-odometer">
@@ -346,7 +320,6 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
         {/* Binary line — spans managed imperatively via binarySpansRef */}
         <div className="binary-line" ref={binaryLineRef} />
 
-        {/* Gradients for timeline focus effect */}
         <div className="timeline-fade-top" />
         {children}
         <div className="timeline-fade-bottom" />

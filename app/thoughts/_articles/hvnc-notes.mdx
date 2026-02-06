@@ -37,7 +37,6 @@ Using `BitBlt` on the desktop DC only gets what's currently visible on top. Mini
 ```cpp
 HWND hWnd = GetTopWindow(NULL);
 hWnd = GetWindow(hWnd, GW_HWNDLAST);
-// Start from bottom
 
 while (hWnd != NULL) {
     if (IsWindowVisible(hWnd)) {
@@ -48,7 +47,7 @@ BitBlt(hDcScreen, rect.left, rect.top,
                rect.right - rect.left, rect.bottom - rect.top,
                hDcWindow, 0, 0, SRCCOPY);
 }
-    hWnd = GetWindow(hWnd, GW_HWNDPREV);  // Walk upward
+    hWnd = GetWindow(hWnd, GW_HWNDPREV);
 }
 ```
 
@@ -80,12 +79,9 @@ POINT point;
 point.x = GET_X_LPARAM(lParam);
 point.y = GET_Y_LPARAM(lParam);
 
-// Find top-level window
 HWND hWnd = WindowFromPoint(point);
-
-// Convert to window coordinates
 ScreenToClient(hWnd, &point);
-// Walk down to find actual control
+
 HWND child = ChildWindowFromPoint(hWnd, point);
 while (child != NULL && child != hWnd) {
     hWnd = child;
@@ -93,7 +89,6 @@ while (child != NULL && child != hWnd) {
 child = ChildWindowFromPoint(hWnd, point);
 }
 
-// Post message with corrected coordinates
 lParam = MAKELPARAM(point.x, point.y);
 PostMessageA(hWnd, msg, wParam, lParam);
 ```

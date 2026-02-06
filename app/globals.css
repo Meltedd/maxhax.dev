@@ -20,7 +20,6 @@
   .font-black { font-variation-settings: 'wght' 800, var(--sans-variation); }
 }
 
-/* Theme */
 @theme {
   --color-rurikon-50: #ebeceb;
   --color-rurikon-100: #d8d9d6;
@@ -60,7 +59,6 @@
   --font-features: 'cpsp' 1, 'cv01', 'cv03', 'cv04', 'calt', 'ss03', 'liga', 'ordn';
 }
 
-/* Base */
 html {
   font-size: clamp(13.5px, 0.9vw + 10px, 19px);
 }
@@ -98,7 +96,6 @@ main {
 del { text-decoration-thickness: 1px; }
 blockquote + blockquote { display: flow-root; }
 
-/* Links */
 a {
   transition: color 0.3s ease;
   position: relative;
@@ -119,7 +116,6 @@ main a:hover span { color: var(--color-link-hover); }
 
 .underline:hover { text-decoration-thickness: 2px; }
 
-/* Utilities */
 .nowrap-group { white-space: nowrap; }
 .content-fade-out { background: linear-gradient(to bottom, var(--background), transparent); }
 

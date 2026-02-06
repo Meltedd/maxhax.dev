@@ -24,7 +24,7 @@ struct Object {
 void process(struct Object *obj, char *input) {
     strcpy(obj->buffer, input);
     // no bounds checking
-    obj->handler(obj->buffer);   // call through pointer
+    obj->handler(obj->buffer);
 }
 ```
 

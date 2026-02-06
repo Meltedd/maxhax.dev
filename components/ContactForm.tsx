@@ -18,7 +18,7 @@ export function ContactForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (website.trim()) return // bot check
+    if (website.trim()) return
     if (!email.trim() || !message.trim() || isPending) return
 
     startTransition(async () => {
@@ -140,7 +140,6 @@ export function ContactForm() {
           </div>
         </div>
 
-        {/* Honeypot */}
         <div aria-hidden="true" className="sr-only">
           <label htmlFor="website">Website</label>
           <input

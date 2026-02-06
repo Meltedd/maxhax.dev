@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 function isValidSlug(slug: string): boolean {
-  // Only allow alphanumeric, hyphens, and underscores
   return /^[a-zA-Z0-9_-]+$/.test(slug)
 }
 
