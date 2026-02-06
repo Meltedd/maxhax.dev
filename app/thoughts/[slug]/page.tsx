@@ -22,7 +22,7 @@ export default async function Page({ params }: PageProps) {
   
   let MDXContent: React.ComponentType
   try {
-    const mod = await import('../_articles/' + `${resolvedParams.slug}.mdx`)
+    const mod = await import(`../_articles/${resolvedParams.slug}.mdx`)
     MDXContent = mod.default
   } catch {
     notFound()
@@ -68,7 +68,7 @@ export async function generateMetadata({ params }: GenerateMetadataProps) {
   }
   
   try {
-    const mod = await import('../_articles/' + `${resolvedParams.slug}.mdx`)
+    const mod = await import(`../_articles/${resolvedParams.slug}.mdx`)
     const metadata = mod.metadata
     return {
       title: metadata.title,
