@@ -108,7 +108,7 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
   numDigitsRef.current = numDigits
 
   // Stable refs for callbacks used in scroll/timeout closures.
-  // Initialized as null, synced to latest closures via effect below.
+  // Synced to latest closures inline below (same pattern as numDigitsRef).
   const updateMeasurementsRef = useRef<typeof updateMeasurements>(null!)
   const updateStickyYearRef = useRef<typeof updateStickyYear>(null!)
   const renderBinaryRef = useRef<typeof renderBinary>(null!)
@@ -137,15 +137,6 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
     }, 4000)
     return () => clearTimeout(timeout)
   }, [])
-
-  // Keep refs in sync with latest closures
-  useEffect(() => {
-    updateMeasurementsRef.current = updateMeasurements
-    updateStickyYearRef.current = updateStickyYear
-    renderBinaryRef.current = renderBinary
-    startDecayTailRef.current = startDecayTail
-    updateFromScrollRef.current = updateFromScroll
-  })
 
   // Measure sections and update doc height
   const updateMeasurements = () => {
@@ -285,6 +276,13 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
     updateStickyYearRef.current()
     renderBinaryRef.current(scrollY)
   }
+
+  // Sync callback refs every render (inline, not deferred like useEffect)
+  updateMeasurementsRef.current = updateMeasurements
+  updateStickyYearRef.current = updateStickyYear
+  renderBinaryRef.current = renderBinary
+  startDecayTailRef.current = startDecayTail
+  updateFromScrollRef.current = updateFromScroll
 
   // Calculate number of digits and setup scroll listeners
   useEffect(() => {
