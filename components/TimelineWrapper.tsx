@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef, useMemo } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useLatest } from '@/hooks/useLatest'
 
 interface TimelineWrapperProps { children: React.ReactNode }
@@ -34,18 +34,16 @@ const buildBinary = (scrollPos: number, numDigits: number): string => {
   return binary.slice(0, numDigits)
 }
 
-// Apply scrambling to binary string based on intensity
+// Apply scrambling to binary string based on scroll momentum
 const scrambleDigits = (
   base: string,
   intensity: number,
   scrollPos: number,
   docHeight: number,
   scrambledMap: Map<number, { value: string; time: number }>
-): { display: string; indices: Set<number>; changed: number[] } => {
+): string => {
   const numDigits = base.length
   const chars = base.split('')
-  const indices = new Set<number>()
-  const changed: number[] = []
   const now = Date.now()
   const center = (docHeight > 0 ? scrollPos / docHeight : 0) * numDigits
   const width = 80 + intensity * 70
@@ -54,7 +52,6 @@ const scrambleDigits = (
   scrambledMap.forEach((data, i) => {
     if (now - data.time < SCRAMBLE_DURATION) {
       chars[i] = data.value
-      indices.add(i)
     } else {
       scrambledMap.delete(i)
     }
@@ -68,30 +65,25 @@ const scrambleDigits = (
     if (Math.random() < prob) {
       const value = Math.random() > 0.5 ? '1' : '0'
       chars[i] = value
-      indices.add(i)
-      changed.push(i)
       scrambledMap.set(i, { value, time: now })
     }
   }
 
-  return { display: chars.join(''), indices, changed }
+  return chars.join('')
 }
 
 export function TimelineWrapper({ children }: TimelineWrapperProps) {
-  // UI state
+  // React-managed state (only values that affect JSX structure or text)
   const [yearState, setYearState] = useState({ current: '', next: '', progress: 0 })
-  const [displayString, setDisplayString] = useState('')
-  const [scramblingIndices, setScramblingIndices] = useState<Set<number>>(new Set())
-  const [numDigits, setNumDigits] = useState(295)
-  const [digitChangeKeys, setDigitChangeKeys] = useState<number[]>(() => Array(295).fill(0))
-  const [parallaxOffset, setParallaxOffset] = useState(0)
   const [hasSeenAnimation, setHasSeenAnimation] = useState(false)
 
   // DOM refs
   const timelineRef = useRef<HTMLDivElement>(null)
   const stickyRef = useRef<HTMLDivElement>(null)
+  const binaryLineRef = useRef<HTMLDivElement>(null)
+  const binarySpansRef = useRef<HTMLSpanElement[]>([])
 
-  // Scroll state refs
+  // Scroll state refs (never trigger React renders)
   const scrollStateRef = useRef({
     stickyOffset: 0,
     sections: [] as SectionInfo[],
@@ -104,16 +96,11 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
   })
   const decayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const scrambledDigitsRef = useRef(new Map<number, { value: string; time: number }>())
-  const isScramblingRef = useRef(false)
-  const numDigitsRef = useRef(numDigits)
-  numDigitsRef.current = numDigits
 
-  // Odometer animation values
-  const { currentLastDigit, nextLastDigit, digitOffset } = useMemo(() => ({
-    currentLastDigit: yearState.current ? parseInt(yearState.current.slice(-1)) || 0 : 0,
-    nextLastDigit: yearState.next ? parseInt(yearState.next.slice(-1)) || 0 : 0,
-    digitOffset: yearState.progress * 100
-  }), [yearState])
+  // Odometer animation values — trivially cheap, no memo needed
+  const currentLastDigit = yearState.current ? parseInt(yearState.current.slice(-1)) || 0 : 0
+  const nextLastDigit = yearState.next ? parseInt(yearState.next.slice(-1)) || 0 : 0
+  const digitOffset = yearState.progress * 100
 
   // Session storage: read on mount, write after animation
   useEffect(() => {
@@ -197,35 +184,25 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
     setYearState({ current: last.year, next: last.year, progress: 0 })
   }
 
-  // Render binary string based on scroll position and intensity
+  // Update binary spans directly — no React render needed for this decorative element
   const renderBinary = (scrollY: number) => {
+    const spans = binarySpansRef.current
+    if (!spans.length) return
     const state = scrollStateRef.current
-    const base = buildBinary(scrollY, numDigitsRef.current)
+    const base = buildBinary(scrollY, spans.length)
 
-    if (state.momentum < MIN_INTENSITY) {
-      setDisplayString(base)
-      if (isScramblingRef.current) {
-        setScramblingIndices(new Set())
-        isScramblingRef.current = false
+    const display = state.momentum < MIN_INTENSITY
+      ? base
+      : scrambleDigits(base, state.momentum, scrollY, state.docHeight, scrambledDigitsRef.current)
+
+    for (let i = 0; i < spans.length; i++) {
+      if (spans[i].textContent !== display[i]) {
+        spans[i].textContent = display[i]
       }
-      return
-    }
-
-    const result = scrambleDigits(base, state.momentum, scrollY, state.docHeight, scrambledDigitsRef.current)
-    setDisplayString(result.display)
-    setScramblingIndices(result.indices)
-    isScramblingRef.current = result.indices.size > 0
-
-    if (result.changed.length) {
-      setDigitChangeKeys((prev) => {
-        const keys = [...prev]
-        result.changed.forEach((i) => { if (i < keys.length) keys[i]++ })
-        return keys
-      })
     }
   }
 
-  // Decay tail
+  // Decay tail — gradually reduces scramble intensity after scrolling stops
   const startDecayTail = () => {
     if (decayTimeoutRef.current) clearTimeout(decayTimeoutRef.current)
     const state = scrollStateRef.current
@@ -239,8 +216,6 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
         decayTimeoutRef.current = setTimeout(step, DECAY_INTERVAL)
       } else {
         state.momentum = 0
-        setScramblingIndices(new Set())
-        isScramblingRef.current = false
         renderBinaryRef.current(state.lastY)
         decayTimeoutRef.current = null
       }
@@ -265,7 +240,10 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
 
     state.lastY = scrollY
     state.lastTime = timestamp
-    setParallaxOffset(scrollY * 0.4)
+
+    if (binaryLineRef.current) {
+      binaryLineRef.current.style.transform = `translateY(-${scrollY * 0.4}px)`
+    }
     updateStickyYearRef.current()
     renderBinaryRef.current(scrollY)
   }
@@ -281,24 +259,46 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    const calculateDigits = () => {
+    const syncSpans = () => {
+      const container = binaryLineRef.current
+      if (!container) return
       const entries = document.querySelectorAll('.timeline-entry')
-      const binaryDigit = document.querySelector('.binary-digit') as HTMLElement
-      if (!entries.length || !binaryDigit) return
+      if (!entries.length) return
+
+      // Need at least one span to measure digit height
+      const existingSpans = binarySpansRef.current
+      if (!existingSpans.length) {
+        const seed = document.createElement('span')
+        seed.className = 'binary-digit'
+        seed.textContent = '0'
+        container.appendChild(seed)
+        existingSpans.push(seed)
+      }
+
+      const gap = parseFloat(getComputedStyle(container).gap) || 0
+      const pixelsPerDigit = existingSpans[0].offsetHeight + gap
+      if (pixelsPerDigit <= 0) return // font/CSS not ready — retry on next resize or rAF
 
       const lastEntry = entries[entries.length - 1] as HTMLElement
-      const binaryLine = binaryDigit.parentElement
-      if (!binaryLine) return
-
-      const gap = parseFloat(getComputedStyle(binaryLine).gap) || 0
-      const pixelsPerDigit = binaryDigit.offsetHeight + gap
       const lastEntryBottom = lastEntry.offsetTop + lastEntry.offsetHeight
       const buffer = window.innerWidth < 768 ? 0.35 : 0.38
-      const calculated = Math.ceil((lastEntryBottom * (1 + buffer)) / pixelsPerDigit)
+      const needed = Math.ceil((lastEntryBottom * (1 + buffer)) / pixelsPerDigit)
+      if (needed <= 0 || needed === existingSpans.length) return
 
-      if (calculated > 0 && calculated !== numDigitsRef.current) {
-        setNumDigits(calculated)
-        setDigitChangeKeys(Array(calculated).fill(0))
+      // Add or remove spans to match needed count
+      if (needed > existingSpans.length) {
+        for (let i = existingSpans.length; i < needed; i++) {
+          const span = document.createElement('span')
+          span.className = 'binary-digit'
+          span.textContent = '0'
+          container.appendChild(span)
+          existingSpans.push(span)
+        }
+      } else {
+        while (existingSpans.length > needed) {
+          const removed = existingSpans.pop()!
+          container.removeChild(removed)
+        }
       }
     }
 
@@ -315,11 +315,11 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
 
     const handleResize = () => {
       updateMeasurementsRef.current()
-      calculateDigits()
+      syncSpans()
     }
 
     // Defer initial measurements until after first paint so layout is settled
-    setTimeout(calculateDigits, 100)
+    setTimeout(syncSpans, 100)
     requestAnimationFrame(() => {
       updateMeasurementsRef.current()
       const { sections } = scrollStateRef.current
@@ -337,6 +337,7 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
       window.removeEventListener('resize', handleResize)
       if (decayTimeoutRef.current) clearTimeout(decayTimeoutRef.current)
       scrambledDigitsRef.current.clear()
+      binarySpansRef.current = []
     }
   }, [])
 
@@ -354,18 +355,8 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
       </div>
 
       <div className="timeline" ref={timelineRef}>
-        {/* Binary line display */}
-        <div className="binary-line" style={{ transform: `translateY(-${parallaxOffset}px)` }}>
-          {displayString.split('').map((digit, i) => (
-            <span
-              key={`${i}-${digitChangeKeys[i]}`}
-              className={`binary-digit ${scramblingIndices.has(i) ? 'scrambling' : ''}`}
-              style={{ animationDelay: `${(i % 10) * 0.015}s` }}
-            >
-              {digit}
-            </span>
-          ))}
-        </div>
+        {/* Binary line — spans managed imperatively via binarySpansRef */}
+        <div className="binary-line" ref={binaryLineRef} />
 
         {/* Gradients for timeline focus effect */}
         <div className="timeline-fade-top" />
