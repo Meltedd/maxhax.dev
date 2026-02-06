@@ -4,13 +4,14 @@ import { useRef, useState, useTransition } from 'react'
 import cn from 'clsx'
 import { sendContactEmail } from '@/app/contact/actions'
 
+const MIN_SUBMIT_TIME_MS = 3000
 const MAX_MESSAGE_LENGTH = 5000
 
 export function ContactForm() {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
   const [subject, setSubject] = useState('')
-  const [website, setWebsite] = useState('') // honeypot
+  const [phone, setPhone] = useState('')
   const renderTime = useRef(Date.now())
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
@@ -19,11 +20,12 @@ export function ContactForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (website.trim()) return
+    if (phone.trim()) return
+    if (Date.now() - renderTime.current < MIN_SUBMIT_TIME_MS) return
     if (!email.trim() || !message.trim() || isPending) return
 
     startTransition(async () => {
-      const result = await sendContactEmail(email, subject, message, website, renderTime.current)
+      const result = await sendContactEmail(email, subject, message, phone)
 
       if (result.success) {
         setStatus('success')
@@ -142,15 +144,15 @@ export function ContactForm() {
         </div>
 
         <div aria-hidden="true" className="sr-only">
-          <label htmlFor="website">Website</label>
+          <label htmlFor="phone">Phone</label>
           <input
-            id="website"
-            name="website"
+            id="phone"
+            name="phone"
             type="text"
             tabIndex={-1}
             autoComplete="off"
-            value={website}
-            onChange={(e) => setWebsite(e.target.value)}
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
           />
         </div>
 

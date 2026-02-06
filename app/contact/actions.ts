@@ -4,7 +4,6 @@ import { headers } from 'next/headers'
 import { Resend } from 'resend'
 import { isRateLimited } from './rate-limit'
 
-const MIN_SUBMIT_TIME_MS = 3000
 const MAX_SUBJECT_LENGTH = 200
 const MAX_MESSAGE_LENGTH = 5000
 const MAX_EMAIL_LENGTH = 254 // RFC 5321
@@ -17,10 +16,8 @@ export async function sendContactEmail(
   subject: string,
   message: string,
   honeypot: string,
-  renderTime: number
 ): Promise<SendResult> {
   if (honeypot.trim()) return { success: true }
-  if (Date.now() - renderTime < MIN_SUBMIT_TIME_MS) return { success: true }
 
   const trimmedEmail = senderEmail.trim().toLowerCase()
   const trimmedSubject = subject.trim().slice(0, MAX_SUBJECT_LENGTH)
