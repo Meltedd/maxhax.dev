@@ -121,9 +121,7 @@ main a:hover span { color: var(--color-link-hover); }
 
 /* Utilities */
 .nowrap-group { white-space: nowrap; }
-.space-y-6 > * + * { margin-top: 2.5rem; }
-.space-y-8 > * + * { margin-top: 3rem; }
-.content-fade-out { background: linear-gradient(to bottom, #fcfcfc, #fcfcfc00); }
+.content-fade-out { background: linear-gradient(to bottom, var(--background), transparent); }
 
 .dot-leaders {
   text-align: end;
