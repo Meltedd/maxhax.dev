@@ -107,6 +107,14 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
   const numDigitsRef = useRef(numDigits)
   numDigitsRef.current = numDigits
 
+  // Stable refs for callbacks used in scroll/timeout closures.
+  // Initialized as null, synced to latest closures via effect below.
+  const updateMeasurementsRef = useRef<typeof updateMeasurements>(null!)
+  const updateStickyYearRef = useRef<typeof updateStickyYear>(null!)
+  const renderBinaryRef = useRef<typeof renderBinary>(null!)
+  const startDecayTailRef = useRef<typeof startDecayTail>(null!)
+  const updateFromScrollRef = useRef<typeof updateFromScroll>(null!)
+
   // Odometer animation values
   const { currentLastDigit, nextLastDigit, digitOffset } = useMemo(() => ({
     currentLastDigit: yearState.current ? parseInt(yearState.current.slice(-1)) || 0 : 0,
@@ -129,6 +137,15 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
     }, 4000)
     return () => clearTimeout(timeout)
   }, [])
+
+  // Keep refs in sync with latest closures
+  useEffect(() => {
+    updateMeasurementsRef.current = updateMeasurements
+    updateStickyYearRef.current = updateStickyYear
+    renderBinaryRef.current = renderBinary
+    startDecayTailRef.current = startDecayTail
+    updateFromScrollRef.current = updateFromScroll
+  })
 
   // Measure sections and update doc height
   const updateMeasurements = () => {
@@ -232,7 +249,7 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
 
     const step = () => {
       state.momentum *= DECAY_FACTOR
-      renderBinary(state.lastY)
+      renderBinaryRef.current(state.lastY)
 
       if (++state.decayStep < DECAY_STEPS) {
         decayTimeoutRef.current = setTimeout(step, DECAY_INTERVAL)
@@ -240,7 +257,7 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
         state.momentum = 0
         setScramblingIndices(new Set())
         isScramblingRef.current = false
-        renderBinary(state.lastY)
+        renderBinaryRef.current(state.lastY)
         decayTimeoutRef.current = null
       }
     }
@@ -259,14 +276,14 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
       const cappedVelocity = Math.sign(velocity) * Math.min(Math.abs(velocity), MAX_VELOCITY)
       const normalizedVelocity = Math.abs(cappedVelocity) * VELOCITY_SCALE
       state.momentum = Math.max(state.momentum, Math.min(normalizedVelocity, MAX_MOMENTUM))
-      startDecayTail()
+      startDecayTailRef.current()
     }
 
     state.lastY = scrollY
     state.lastTime = timestamp
     setParallaxOffset(scrollY * 0.4)
-    updateStickyYear()
-    renderBinary(scrollY)
+    updateStickyYearRef.current()
+    renderBinaryRef.current(scrollY)
   }
 
   // Calculate number of digits and setup scroll listeners
@@ -298,7 +315,7 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
       const state = scrollStateRef.current
       if (!state.ticking) {
         requestAnimationFrame(() => {
-          updateFromScroll(window.scrollY, Date.now())
+          updateFromScrollRef.current(window.scrollY, Date.now())
           state.ticking = false
         })
         state.ticking = true
@@ -306,18 +323,18 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
     }
 
     const handleResize = () => {
-      updateMeasurements()
+      updateMeasurementsRef.current()
       calculateDigits()
     }
 
     // Initial setup
     setTimeout(calculateDigits, 100)
-    updateMeasurements()
+    updateMeasurementsRef.current()
     const { sections } = scrollStateRef.current
     if (sections.length > 0) {
       setYearState({ current: sections[0].year, next: sections[1]?.year ?? sections[0].year, progress: 0 })
     }
-    updateFromScroll(window.scrollY, Date.now())
+    updateFromScrollRef.current(window.scrollY, Date.now())
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     window.addEventListener('resize', handleResize)
