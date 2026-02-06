@@ -1,12 +1,12 @@
 'use server'
 
+import { headers } from 'next/headers'
 import { Resend } from 'resend'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
-const CONTACT_EMAIL = process.env.CONTACT_EMAIL!
+import { isRateLimited } from './rate-limit'
 
 const MAX_SUBJECT_LENGTH = 200
 const MAX_MESSAGE_LENGTH = 5000
+const MAX_EMAIL_LENGTH = 254 // RFC 5321
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 type SendResult = { success: true } | { success: false; error: string }
@@ -14,13 +14,16 @@ type SendResult = { success: true } | { success: false; error: string }
 export async function sendContactEmail(
   senderEmail: string,
   subject: string,
-  message: string
+  message: string,
+  honeypot: string,
 ): Promise<SendResult> {
+  if (honeypot.trim()) return { success: true }
+
   const trimmedEmail = senderEmail.trim().toLowerCase()
   const trimmedSubject = subject.trim().slice(0, MAX_SUBJECT_LENGTH)
   const trimmedMessage = message.trim().slice(0, MAX_MESSAGE_LENGTH)
 
-  if (!trimmedEmail || !EMAIL_REGEX.test(trimmedEmail)) {
+  if (!trimmedEmail || trimmedEmail.length > MAX_EMAIL_LENGTH || !EMAIL_REGEX.test(trimmedEmail)) {
     return { success: false, error: 'Valid email required' }
   }
 
@@ -28,15 +31,24 @@ export async function sendContactEmail(
     return { success: false, error: 'Message is required' }
   }
 
-  if (!CONTACT_EMAIL || !process.env.RESEND_API_KEY) {
+  const contactEmail = process.env.CONTACT_EMAIL
+  const apiKey = process.env.RESEND_API_KEY
+  if (!contactEmail || !apiKey) {
     console.error('Missing CONTACT_EMAIL or RESEND_API_KEY environment variables')
     return { success: false, error: 'Server configuration error' }
   }
 
+  const headersList = await headers()
+  const ip = headersList.get('x-forwarded-for')?.split(',')[0].trim()
+  if (await isRateLimited(ip)) {
+    return { success: false, error: 'Too many requests. Please try again later.' }
+  }
+
   try {
+    const resend = new Resend(apiKey)
     const { error } = await resend.emails.send({
       from: 'maxhax.dev <contact@maxhax.dev>',
-      to: CONTACT_EMAIL,
+      to: contactEmail,
       replyTo: trimmedEmail,
       subject: trimmedSubject || 'New message from contact form',
       text: `From: ${trimmedEmail}\n\n${trimmedMessage}`,
