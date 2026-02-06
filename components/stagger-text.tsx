@@ -82,10 +82,12 @@ export function Stagger({ start, step = 0.01, items }: StaggerProps) {
           )
         })
 
+        const suppressSpace = isLink(items[i]) && nextStartsWithPunctuation(items, i)
+
         return (
           <Fragment key={i}>
             {rendered}
-            {i < items.length - 1 && !(isLink(items[i]) && nextStartsWithPunctuation(items, i)) && ' '}
+            {i < items.length - 1 && !suppressSpace && ' '}
           </Fragment>
         )
       })}

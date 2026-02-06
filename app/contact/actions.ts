@@ -36,6 +36,7 @@ export async function sendContactEmail(
   }
 
   const headersList = await headers()
+  // First address in x-forwarded-for chain is the original client
   const ip = headersList.get('x-forwarded-for')?.split(',')[0].trim()
   if (ip && isRateLimited(ip)) {
     return { success: false, error: 'Too many requests. Please try again later.' }
