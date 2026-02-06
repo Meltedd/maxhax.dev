@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import cn from 'clsx'
 import { sendContactEmail } from '@/app/contact/actions'
 
@@ -13,9 +13,16 @@ export function ContactForm() {
   const [subject, setSubject] = useState('')
   const [phone, setPhone] = useState('')
   const renderTime = useRef(Date.now())
+  const statusTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [isPending, startTransition] = useTransition()
+
+  useEffect(() => {
+    return () => {
+      if (statusTimeout.current) clearTimeout(statusTimeout.current)
+    }
+  }, [])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,16 +34,18 @@ export function ContactForm() {
     startTransition(async () => {
       const result = await sendContactEmail(email, subject, message, phone)
 
+      if (statusTimeout.current) clearTimeout(statusTimeout.current)
+
       if (result.success) {
         setStatus('success')
         setEmail('')
         setMessage('')
         setSubject('')
-        setTimeout(() => setStatus('idle'), 3000)
+        statusTimeout.current = setTimeout(() => setStatus('idle'), 3000)
       } else {
         setStatus('error')
         setErrorMsg(result.error)
-        setTimeout(() => setStatus('idle'), 4000)
+        statusTimeout.current = setTimeout(() => setStatus('idle'), 4000)
       }
     })
   }
