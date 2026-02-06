@@ -28,6 +28,6 @@ export default defineConfig([
     },
   },
   {
-    ignores: ['.next/**', 'node_modules/**', '*.tsbuildinfo'],
+    ignores: ['.next/**', 'node_modules/**', '*.tsbuildinfo', 'next-env.d.ts'],
   },
 ])
