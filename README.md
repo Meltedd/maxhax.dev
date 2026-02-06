@@ -29,7 +29,7 @@ Required for the contact form:
 | `RESEND_API_KEY` | API key from [Resend](https://resend.com) |
 | `CONTACT_EMAIL` | Email address to receive contact form submissions |
 
-Optional - enables rate limiting via [Upstash Redis](https://upstash.com). Without these, the contact form works but has no rate limiting.
+Required in production for rate limiting via [Upstash Redis](https://upstash.com). The contact form blocks submissions when these are missing in production. Optional in development.
 
 | Variable | Description |
 | -------- | ----------- |

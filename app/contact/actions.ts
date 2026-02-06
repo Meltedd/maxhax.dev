@@ -6,6 +6,7 @@ import { isRateLimited } from './rate-limit'
 
 const MAX_SUBJECT_LENGTH = 200
 const MAX_MESSAGE_LENGTH = 5000
+const MAX_EMAIL_LENGTH = 254 // RFC 5321
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 type SendResult = { success: true } | { success: false; error: string }
@@ -19,7 +20,7 @@ export async function sendContactEmail(
   const trimmedSubject = subject.trim().slice(0, MAX_SUBJECT_LENGTH)
   const trimmedMessage = message.trim().slice(0, MAX_MESSAGE_LENGTH)
 
-  if (!trimmedEmail || !EMAIL_REGEX.test(trimmedEmail)) {
+  if (!trimmedEmail || trimmedEmail.length > MAX_EMAIL_LENGTH || !EMAIL_REGEX.test(trimmedEmail)) {
     return { success: false, error: 'Valid email required' }
   }
 
@@ -36,7 +37,7 @@ export async function sendContactEmail(
 
   const headersList = await headers()
   const ip = headersList.get('x-forwarded-for')?.split(',')[0].trim()
-  if (ip && await isRateLimited(ip)) {
+  if (await isRateLimited(ip)) {
     return { success: false, error: 'Too many requests. Please try again later.' }
   }
 

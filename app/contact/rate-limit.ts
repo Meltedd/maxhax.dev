@@ -4,7 +4,7 @@ import { Redis } from '@upstash/redis'
 const WINDOW_SECONDS = 60
 const MAX_REQUESTS = 5
 
-// Lazily initialised — null when Upstash env vars are absent (e.g. local dev).
+// Lazily initialised - null when Upstash env vars are absent (e.g. local dev).
 let ratelimit: Ratelimit | null = null
 
 function getRatelimit(): Ratelimit | null {
@@ -21,11 +21,29 @@ function getRatelimit(): Ratelimit | null {
 
 /**
  * Returns true if the request should be blocked.
- * Fails open: if Redis is unreachable or unconfigured, the request is allowed.
+ *
+ * - Production: blocks when Upstash is unconfigured (deployment error) or IP is missing.
+ * - Development: allows requests through when unconfigured.
+ * - Runtime Redis failures always fail open (transient - don't break the form for everyone).
  */
-export async function isRateLimited(ip: string): Promise<boolean> {
+export async function isRateLimited(ip: string | undefined): Promise<boolean> {
   const rl = getRatelimit()
-  if (!rl) return false
+
+  if (!rl) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('Rate limiting not configured in production - blocking request')
+      return true
+    }
+    return false
+  }
+
+  if (!ip) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('Missing client IP in production - blocking request')
+      return true
+    }
+    return false
+  }
 
   try {
     const { success } = await rl.limit(ip)
