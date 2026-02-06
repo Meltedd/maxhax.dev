@@ -28,6 +28,11 @@ export default defineConfig([
     },
   },
   {
-    ignores: ['.next/**', 'node_modules/**', '*.tsbuildinfo'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    },
+  },
+  {
+    ignores: ['.next/**', 'node_modules/**', '*.tsbuildinfo', 'next-env.d.ts'],
   },
 ])

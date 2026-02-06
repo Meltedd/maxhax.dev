@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 function isValidSlug(slug: string): boolean {
-  // Only allow alphanumeric, hyphens, and underscores
   return /^[a-zA-Z0-9_-]+$/.test(slug)
 }
 
@@ -22,7 +21,7 @@ export default async function Page({ params }: PageProps) {
   
   let MDXContent: React.ComponentType
   try {
-    const mod = await import('../_articles/' + `${resolvedParams.slug}.mdx`)
+    const mod = await import(`../_articles/${resolvedParams.slug}.mdx`)
     MDXContent = mod.default
   } catch {
     notFound()
@@ -31,7 +30,7 @@ export default async function Page({ params }: PageProps) {
   return (
     <div
       className={cn(
-        'thought-article max-w-[66ch] mobile:max-w-[min(66ch,50vw)] space-y-[clamp(1rem,1.6vw,1.75rem)] text-[clamp(0.95rem,0.65vw+0.95rem,1.25rem)]',
+        'thought-article max-w-[66ch] mobile:max-w-[min(66ch,60vw)] space-y-[clamp(1rem,1.6vw,1.75rem)] text-[clamp(0.95rem,0.65vw+0.95rem,1.25rem)]',
       )}
       lang='en'
     >
@@ -68,7 +67,7 @@ export async function generateMetadata({ params }: GenerateMetadataProps) {
   }
   
   try {
-    const mod = await import('../_articles/' + `${resolvedParams.slug}.mdx`)
+    const mod = await import(`../_articles/${resolvedParams.slug}.mdx`)
     const metadata = mod.metadata
     return {
       title: metadata.title,

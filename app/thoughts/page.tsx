@@ -8,6 +8,15 @@ export const metadata = {
 
 export const dynamic = 'force-static'
 
+/** Parse a `YYYY.MM.DD` date string into a numeric sort key (YYYYMMDD), or 0 if malformed. */
+function dateSortKey(date: string): number {
+  const parts = date.split('.')
+  if (parts.length !== 3) return 0
+  const [y, m, d] = parts.map(Number)
+  if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return 0
+  return y * 10000 + m * 100 + d
+}
+
 const articlesDirectory = path.join(
   process.cwd(),
   'app',
@@ -21,21 +30,21 @@ export default async function Page() {
 
   for (const article of articles) {
     if (!article.endsWith('.mdx')) continue
-    const articleModule = await import('./_articles/' + article)
-    if (!articleModule.metadata) throw new Error('Missing `metadata` in ' + article)
+    const articleModule = await import(`./_articles/${article}`)
+    if (!articleModule.metadata) throw new Error(`Missing \`metadata\` in ${article}`)
 
     items.push({
       slug: article.replace(/\.mdx$/, ''),
       title: articleModule.metadata.title,
       date: articleModule.metadata.date || '-',
-      sort: Number(articleModule.metadata.date?.replaceAll('.', '') || 0),
+      sort: articleModule.metadata.date ? dateSortKey(articleModule.metadata.date) : 0,
     })
   }
 
   items.sort((a, b) => b.sort - a.sort)
 
   return (
-    <div className="max-w-[66ch] mobile:max-w-[min(66ch,50vw)]">
+    <div className="max-w-[66ch] mobile:max-w-[min(66ch,60vw)]">
       <h1 className="text-4xl sm:text-5xl font-bold text-rurikon-700 mb-6 tracking-tight eb-garamond-italic">
         Thoughts
       </h1>
