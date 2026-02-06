@@ -166,7 +166,7 @@ export function ContactForm() {
             'resize-none bg-transparent border-none outline-none rounded',
             'min-h-[clamp(220px,32vw,460px)] px-[clamp(0.75rem,2vw,1rem)] py-[clamp(0.5rem,1.5vw,0.75rem)]',
             'text-[clamp(0.95rem,1.7vw,1rem)] text-rurikon-600 font-serif leading-normal eb-garamond-placeholder',
-            'placeholder:text-rurikon-300 placeholder:italic placeholder:text-[clamp(0.95rem,1.7vw,1rem)]',
+            'placeholder:text-rurikon-300 placeholder:italic',
             'cursor-text caret-rurikon-600 overflow-y-auto transition-all duration-300 ease-out',
           )}
           name="message"

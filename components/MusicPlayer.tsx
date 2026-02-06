@@ -37,4 +37,3 @@ export function MusicPlayer({ src, title }: MusicPlayerProps) {
     </div>
   )
 }
-
