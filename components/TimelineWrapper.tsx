@@ -41,44 +41,6 @@ const buildBinary = (scrollPos: number, numDigits: number): string => {
   return binary.slice(0, numDigits)
 }
 
-// Apply scrambling to binary string based on scroll momentum
-const scrambleDigits = (
-  base: string,
-  intensity: number,
-  scrollPos: number,
-  docHeight: number,
-  scrambledMap: Map<number, { value: string; time: number }>
-): string => {
-  const numDigits = base.length
-  const chars = base.split('')
-  const now = Date.now()
-  const center = (docHeight > 0 ? scrollPos / docHeight : 0) * numDigits
-  const width = 80 + intensity * 70
-
-  // Apply existing scrambled values and clean expired
-  scrambledMap.forEach((data, i) => {
-    if (now - data.time < SCRAMBLE_DURATION) {
-      chars[i] = data.value
-    } else {
-      scrambledMap.delete(i)
-    }
-  })
-
-  // Add new scrambles
-  for (let i = 0; i < numDigits; i++) {
-    const dist = Math.abs(i - center)
-    if (dist >= width || scrambledMap.has(i)) continue
-    const prob = intensity * (1 - dist / width) * 0.2
-    if (Math.random() < prob) {
-      const value = Math.random() > 0.5 ? '1' : '0'
-      chars[i] = value
-      scrambledMap.set(i, { value, time: now })
-    }
-  }
-
-  return chars.join('')
-}
-
 export function TimelineWrapper({ children }: TimelineWrapperProps) {
   // React-managed state (only values that affect JSX structure or text)
   const [yearState, setYearState] = useState({ current: '', next: '', progress: 0 })
@@ -198,20 +160,43 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
     setYearIfChanged(last.year, last.year, 0)
   }
 
-  // Update binary spans directly — no React render needed for this decorative element
+  // Update binary spans directly — no React render needed for this decorative element.
+  // Scramble logic is inlined to avoid per-frame split()/join() allocation.
   const renderBinary = (scrollY: number) => {
     const spans = binarySpansRef.current
     if (!spans.length) return
     const state = scrollStateRef.current
     const base = buildBinary(scrollY, spans.length)
+    const map = scrambledDigitsRef.current
 
-    const display = state.momentum < MIN_INTENSITY
-      ? base
-      : scrambleDigits(base, state.momentum, scrollY, state.docHeight, scrambledDigitsRef.current)
+    if (state.momentum >= MIN_INTENSITY) {
+      const now = Date.now()
+      const center = (state.docHeight > 0 ? scrollY / state.docHeight : 0) * spans.length
+      const width = 80 + state.momentum * 70
 
-    for (let i = 0; i < spans.length; i++) {
-      if (spans[i].textContent !== display[i]) {
-        spans[i].textContent = display[i]
+      // Clean expired entries
+      map.forEach((data, i) => {
+        if (now - data.time >= SCRAMBLE_DURATION) map.delete(i)
+      })
+
+      // Add new scrambles near scroll position
+      for (let i = 0; i < spans.length; i++) {
+        const dist = Math.abs(i - center)
+        if (dist >= width || map.has(i)) continue
+        const prob = state.momentum * (1 - dist / width) * 0.2
+        if (Math.random() < prob) {
+          map.set(i, { value: Math.random() > 0.5 ? '1' : '0', time: now })
+        }
+      }
+
+      // Write to spans, preferring scrambled values over base
+      for (let i = 0; i < spans.length; i++) {
+        const ch = map.get(i)?.value ?? base[i]
+        if (spans[i].textContent !== ch) spans[i].textContent = ch
+      }
+    } else {
+      for (let i = 0; i < spans.length; i++) {
+        if (spans[i].textContent !== base[i]) spans[i].textContent = base[i]
       }
     }
   }
@@ -224,13 +209,13 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
 
     const step = () => {
       state.momentum *= DECAY_FACTOR
-      renderBinaryRef.current(state.lastY)
+      callbacks.current.renderBinary(state.lastY)
 
       if (++state.decayStep < DECAY_STEPS) {
         decayTimeoutRef.current = setTimeout(step, DECAY_INTERVAL)
       } else {
         state.momentum = 0
-        renderBinaryRef.current(state.lastY)
+        callbacks.current.renderBinary(state.lastY)
         decayTimeoutRef.current = null
       }
     }
@@ -249,7 +234,7 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
       const cappedVelocity = Math.sign(velocity) * Math.min(Math.abs(velocity), MAX_VELOCITY)
       const normalizedVelocity = Math.abs(cappedVelocity) * VELOCITY_SCALE
       state.momentum = Math.max(state.momentum, Math.min(normalizedVelocity, MAX_MOMENTUM))
-      startDecayTailRef.current()
+      callbacks.current.startDecayTail()
     }
 
     state.lastY = scrollY
@@ -258,16 +243,12 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
     if (binaryLineRef.current) {
       binaryLineRef.current.style.transform = `translateY(-${scrollY * 0.4}px)`
     }
-    updateStickyYearRef.current()
-    renderBinaryRef.current(scrollY)
+    callbacks.current.updateStickyYear()
+    callbacks.current.renderBinary(scrollY)
   }
 
-  // Stable refs that always point to the latest closure, avoiding stale captures in scroll/timeout callbacks.
-  const updateMeasurementsRef = useLatest(updateMeasurements)
-  const updateStickyYearRef = useLatest(updateStickyYear)
-  const renderBinaryRef = useLatest(renderBinary)
-  const startDecayTailRef = useLatest(startDecayTail)
-  const updateFromScrollRef = useLatest(updateFromScroll)
+  // Single stable ref to latest closures, avoiding stale captures in scroll/timeout callbacks.
+  const callbacks = useLatest({ updateMeasurements, updateStickyYear, renderBinary, startDecayTail, updateFromScroll })
 
   // Calculate number of digits and setup scroll listeners
   useEffect(() => {
@@ -318,7 +299,7 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
       const state = scrollStateRef.current
       if (!state.ticking) {
         requestAnimationFrame(() => {
-          updateFromScrollRef.current(window.scrollY, Date.now())
+          callbacks.current.updateFromScroll(window.scrollY, Date.now())
           state.ticking = false
         })
         state.ticking = true
@@ -326,19 +307,19 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
     }
 
     const handleResize = () => {
-      updateMeasurementsRef.current()
+      callbacks.current.updateMeasurements()
       syncSpans()
     }
 
     // Defer initial measurements until after first paint so layout is settled
     setTimeout(syncSpans, 100)
     requestAnimationFrame(() => {
-      updateMeasurementsRef.current()
+      callbacks.current.updateMeasurements()
       const { sections } = scrollStateRef.current
       if (sections.length > 0) {
         setYearIfChanged(sections[0].year, sections[1]?.year ?? sections[0].year, 0)
       }
-      updateFromScrollRef.current(window.scrollY, Date.now())
+      callbacks.current.updateFromScroll(window.scrollY, Date.now())
     })
 
     window.addEventListener('scroll', handleScroll, { passive: true })
