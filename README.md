@@ -29,6 +29,13 @@ Required for the contact form:
 | `RESEND_API_KEY` | API key from [Resend](https://resend.com) |
 | `CONTACT_EMAIL` | Email address to receive contact form submissions |
 
+Optional - enables rate limiting via [Upstash Redis](https://upstash.com). Without these, the contact form works but has no rate limiting.
+
+| Variable | Description |
+| -------- | ----------- |
+| `UPSTASH_REDIS_REST_URL` | Upstash Redis REST endpoint |
+| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST token |
+
 ## Scripts
 
 | Command | Description |
@@ -49,6 +56,8 @@ app/
 └── page.mdx      # Home
 
 components/       # React components
+hooks/            # Custom React hooks
+styles/           # Extracted CSS modules
 assets/           # Images
 public/           # Static assets
 ```
