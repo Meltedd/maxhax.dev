@@ -82,8 +82,9 @@ export const components: Record<
   ),
   code: async (props) => {
     if (typeof props.children === 'string') {
+      const lang = props.className?.replace('language-', '') || 'text'
       const code = await codeToHtml(props.children, {
-        lang: 'jsx',
+        lang,
         theme: cssVariablesTheme,
         transformers: [
           {
