@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useRef, useState, useTransition } from 'react'
 import cn from 'clsx'
 import { sendContactEmail } from '@/app/contact/actions'
 
@@ -11,6 +11,7 @@ export function ContactForm() {
   const [message, setMessage] = useState('')
   const [subject, setSubject] = useState('')
   const [website, setWebsite] = useState('') // honeypot
+  const renderTime = useRef(Date.now())
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [isPending, startTransition] = useTransition()
@@ -22,7 +23,7 @@ export function ContactForm() {
     if (!email.trim() || !message.trim() || isPending) return
 
     startTransition(async () => {
-      const result = await sendContactEmail(email, subject, message)
+      const result = await sendContactEmail(email, subject, message, website, renderTime.current)
 
       if (result.success) {
         setStatus('success')
