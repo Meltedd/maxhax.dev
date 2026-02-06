@@ -10,11 +10,13 @@ export const metadata = {
 >
 >  — Friedrich Nietzsche
 
-Code describes a theoretical state: call this function, return here. Hardware ignores this theory. It operates on raw memory addresses, indifferent to the high-level abstractions of control flow. If you can write to the right address, you can change what the program does next.
+The hardware has [memory addresses](https://en.wikipedia.org/wiki/Memory_address), and nothing about an address says who put it there or why. What a programmer writes as a function call is, at the machine level, an address being loaded into a register and jumped to. Those addresses live in memory that can be written to.
 
-## Function Pointers
+## Pointers
 
-Indirect calls work by storing an address and jumping to it at runtime:
+A [function pointer](https://en.wikipedia.org/wiki/Function_pointer)'s destination lives in memory alongside program data, resolved only when the call actually happens.
+
+In this struct, a 64-byte buffer sits next to a function pointer.
 ```c
 struct Object {
     char buffer[64];
@@ -23,29 +25,30 @@ struct Object {
 
 void process(struct Object *obj, char *input) {
     strcpy(obj->buffer, input);
-    // no bounds checking
     obj->handler(obj->buffer);
 }
 ```
 
-The handler points to a legitimate function. If you overflow the buffer, you overwrite the function pointer. When the program calls `obj->handler()`, it jumps to whatever address you wrote there.
+Here, `handler` is a legitimate function pointer that gets called after the buffer is filled. Since `strcpy` doesn't check bounds, [overflowing the buffer](https://en.wikipedia.org/wiki/Buffer_overflow) writes past its 64 bytes and into `handler`.
 
 <BlockSideTitle title={<>
-  Memory layout before and after overflow. The function pointer gets overwritten along with the buffer.
+  The buffer and function pointer are adjacent in memory.
 </>}>
 ```
-Normal object:           After overflow:
-[buffer: 64 bytes]      [buffer: "A" * 72]
-[handler: 0x401234]     [handler: 0xdeadbeef]
++---------------------+
+|  buffer (64 bytes)    |  <- input
++---------------------+
+|  handler (8 bytes)    |  <- overflow
++---------------------+
 ```
 </BlockSideTitle>
 
-C++ vtables work this way. Callback mechanisms work this way. Any indirect call works this way. The program stores an address in memory and assumes it points to valid code. If you can write to that memory, you can redirect execution.
+When the program calls `obj->handler()`, it jumps to whatever address is stored there.
 
-Virtual methods are implemented as function pointers in vtables. Callbacks are function pointers passed as arguments. At runtime, these are all just addresses being dereferenced and jumped to.
+At runtime, C++ vtables, callbacks, and any other indirect call are all just addresses being dereferenced and jumped to. The processor executes whatever address ends up in the register, whether it came from a legitimate call or corrupted memory.
 
-## Hardware Reality
+[CFI](https://en.wikipedia.org/wiki/Control-flow_integrity) checks that indirect calls target valid functions, and [CET](https://www.intel.com/content/www/us/en/developer/articles/technical/technical-look-control-flow-enforcement-technology.html) uses hardware shadow stacks to verify return addresses, adding hardware enforcement to what was previously just software convention.
 
-The processor has no concept of whether an address came from a legitimate call or from corrupted memory; it indiscriminately executes whatever address is stored in the register.
+## Overflow
 
-Modern mitigations add verification layers. CFI checks that indirect calls target valid functions, while CET uses hardware shadow stacks to verify return addresses. These protections represent the hardware evolving to enforce the software's original intent, creating a stricter environment where raw memory access is no longer sufficient to hijack control.
+To the hardware, the programmer's intended call and the attacker's payload are both just an address. The only fact is whatever ends up in the register, and everything else was just interpretation.

@@ -1,0 +1,35 @@
+export const metadata = {
+  title: 'Who Signs the Signer?',
+  date: '2025.10.17',
+  description: 'A commentary on the limits of verification',
+}
+
+# Who Signs the Signer?
+
+The certificate chain doesn't survive many questions - keep asking who signed what, and you end up at a root that signed itself. Most assumptions in security are, too.
+
+## Who?
+
+Without identity verification, a [man-in-the-middle](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) (MITM) can negotiate encryption with both parties and forward traffic between them, keeping the channel encrypted to the wrong endpoint the entire time.
+
+[Certificates](https://en.wikipedia.org/wiki/X.509) solve this by binding a [public key](https://en.wikipedia.org/wiki/Public-key_cryptography) to a domain name, signed by a [Certificate Authority](https://en.wikipedia.org/wiki/Certificate_authority) your browser already trusts.
+
+<BlockSideTitle title={<>
+  Certificate chains delegate authority from root CAs through intermediaries to end-entity certificates.
+</>}>
+<div className="framed">![Certificate Chain](certificate-chain.png)</div>
+</BlockSideTitle>
+
+Root CAs sign intermediate CAs, which sign the certificates servers actually use, and your browser trusts a set of root CAs that ship with the operating system because your OS vendor decided to include them.
+
+## What?
+
+In 2011, [DigiNotar](https://en.wikipedia.org/wiki/DigiNotar), a trusted root CA, was compromised. Attackers issued fraudulent certificates for Google that every browser accepted. One link in the chain failed, and the whole thing came apart.
+
+After DigiNotar, [Certificate Transparency](https://certificate.transparency.dev/) introduced public append-only logs that record every certificate a CA issues. Issuance can now be monitored and audited, but that's still just another entity to trust.
+
+On corporate networks, a root CA installed on employee machines lets the network generate certificates on the fly for every HTTPS connection, decrypting and re-encrypting traffic as it passes through. Technically identical to a MITM attack, the only difference is who installed the root certificate and whether you agreed to it.
+
+## Why?
+
+Every system has a version of the self-signed root, some assumption at the foundation that everything else is built on. The certificate chain makes it literal, and most of [vulnerability research](https://phrack.org/issues/49/14) is finding the ones that aren't.

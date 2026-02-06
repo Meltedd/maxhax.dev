@@ -6,18 +6,12 @@ export const metadata = {
 
 # On Patching
 
-Every few months a critical vulnerability is published, triggering a predictable cycle: disclosure, panic, and a scramble to update systems. Frequently, however, the resulting patch acts as a disturbance to a coevolved ecosystem.
+A critical vulnerability drops, and the cycle is always the same: disclosure, rush a fix, then scramble to update. The patch that follows often fixes the vulnerability while unknowingly breaking something else.
 
-Patches are written under time pressure by developers who understand the specific vulnerability but not necessarily the myriad ways the original code acts as a dependency. They fix the immediate problem, usually by adding checks or altering behavior to close the hole.
+Developers writing these patches understand the specific vulnerability but rarely how other code depends on the behavior being changed.
 
-Software systems, however, are dense with unintended dependencies. Other parts of the code often rely on the exact behavior that has just been "fixed," breaking assumptions elsewhere in the stack.
+The [Meltdown and Spectre patches](https://meltdownattack.com/) required fundamental changes to how operating systems handle memory isolation, adding checks that slowed performance and broke specific virtualization setups. We're still managing those regressions years later, and it was naive to think we could trivially patch something that runs that deep in how processors work without rippling repercussions.
 
-The [Meltdown and Spectre patches](https://meltdownattack.com/) required fundamental changes to how operating systems handle memory isolation. The fixes added checks that slowed performance, broke specific virtualization setups, and introduced new edge cases.
+## Entanglement
 
-Years later, we still manage performance regressions from those patches. They weren't written poorly; they simply attempted to correct a mechanism deeply embedded in processor logic.
-
-Examination of patch diffs often reveals this pattern. A fix makes sense in isolation, yet analysis of the broader system shows how it destabilizes other components. Occasionally, a patch introduces a new vulnerability by creating a code path that didn't exist before, one that hasn't been tested through years of use.
-
-Vulnerabilities are rarely discrete problems solvable in isolation. They are symptoms of system design and historical assumptions.
-
-We treat these as bugs to be corrected, yet they often function as load-bearing struts where the system has adapted around the fault. The vulnerability and the system have coevolved, making it difficult to remove one without compromising the other.
+Most vulnerabilities are entangled with the system's design and history, not discrete problems you can solve in isolation. Over time the system adapts around its faults, and pulling one out compromises what grew to depend on it, or introduces code paths that haven't been tested through years of use. I've learned that reading patch diffs the same way I read vulnerability disclosures can be more valuable a habit than one would expect.

