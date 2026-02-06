@@ -4,9 +4,6 @@ import { headers } from 'next/headers'
 import { Resend } from 'resend'
 import { isRateLimited } from './rate-limit'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-const CONTACT_EMAIL = process.env.CONTACT_EMAIL
-
 const MAX_SUBJECT_LENGTH = 200
 const MAX_MESSAGE_LENGTH = 5000
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -30,7 +27,9 @@ export async function sendContactEmail(
     return { success: false, error: 'Message is required' }
   }
 
-  if (!CONTACT_EMAIL || !process.env.RESEND_API_KEY) {
+  const contactEmail = process.env.CONTACT_EMAIL
+  const apiKey = process.env.RESEND_API_KEY
+  if (!contactEmail || !apiKey) {
     console.error('Missing CONTACT_EMAIL or RESEND_API_KEY environment variables')
     return { success: false, error: 'Server configuration error' }
   }
@@ -42,9 +41,10 @@ export async function sendContactEmail(
   }
 
   try {
+    const resend = new Resend(apiKey)
     const { error } = await resend.emails.send({
       from: 'maxhax.dev <contact@maxhax.dev>',
-      to: CONTACT_EMAIL,
+      to: contactEmail,
       replyTo: trimmedEmail,
       subject: trimmedSubject || 'New message from contact form',
       text: `From: ${trimmedEmail}\n\n${trimmedMessage}`,
