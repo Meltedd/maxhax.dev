@@ -57,7 +57,7 @@ app/
 
 components/       # React components
 hooks/            # Custom React hooks
-styles/           # Extracted CSS modules
+styles/           # Extracted CSS
 assets/           # Images
 public/           # Static assets
 ```
