@@ -8,7 +8,7 @@ import Image from 'next/image'
 // @ts-expect-error - react-katex doesn't have proper TypeScript declarations
 import { InlineMath, BlockMath } from 'react-katex'
 
-import { BlockSideTitle } from '@/components/block-sidetitle'
+import { BlockSideTitle } from '@/components/BlockSideTitle'
 
 const cssVariablesTheme = createCssVariablesTheme({})
 
@@ -73,8 +73,7 @@ export const components: Record<
   strong: (props) => <strong className='font-bold' {...props} />,
   blockquote: (props) => (
     <blockquote
-      className='my-8 pl-6 italic text-rurikon-500 [&>p]:mb-2'
-      style={{ borderLeft: '2px solid #d8d9d6' }}
+      className='my-8 pl-6 italic text-rurikon-500 [&>p]:mb-2 border-l-2 border-rurikon-100'
       {...props}
     />
   ),

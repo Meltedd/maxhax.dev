@@ -2,7 +2,7 @@ export type TimelineBodyPart =
   | { type: 'text'; text: string }
   | { type: 'link'; text: string; href: string }
 
-export type TimelineEntry = {
+export interface TimelineEntry {
   year: string
   month: string
   body: TimelineBodyPart[]

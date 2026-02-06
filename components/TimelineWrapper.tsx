@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useRef, useMemo } from 'react'
 
-type TimelineWrapperProps = { children: React.ReactNode }
-type SectionInfo = { year: string; start: number; end: number }
+interface TimelineWrapperProps { children: React.ReactNode }
+interface SectionInfo { year: string; start: number; end: number }
 
 const TRANSITION_START_RATIO = 0.4
 const SCROLL_SNAP = 50

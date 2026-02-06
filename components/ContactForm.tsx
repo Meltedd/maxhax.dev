@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { sendContactEmail } from './actions'
+import cn from 'clsx'
+import { sendContactEmail } from '@/app/contact/actions'
 
 const MAX_MESSAGE_LENGTH = 5000
 
@@ -162,8 +163,13 @@ export function ContactForm() {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type here…"
-          className="resize-none bg-transparent border-none outline-none text-[clamp(0.95rem,1.7vw,1rem)] text-rurikon-600 font-serif placeholder:text-rurikon-300 placeholder:italic transition-all duration-300 ease-out px-[clamp(0.75rem,2vw,1rem)] py-[clamp(0.5rem,1.5vw,0.75rem)] leading-relaxed cursor-text rounded placeholder:text-[clamp(0.95rem,1.7vw,1rem)] overflow-y-auto eb-garamond-placeholder"
-          style={{ minHeight: 'clamp(220px, 32vw, 460px)', caretColor: '#45403a', lineHeight: '1.5' }}
+          className={cn(
+            'resize-none bg-transparent border-none outline-none rounded',
+            'min-h-[clamp(220px,32vw,460px)] px-[clamp(0.75rem,2vw,1rem)] py-[clamp(0.5rem,1.5vw,0.75rem)]',
+            'text-[clamp(0.95rem,1.7vw,1rem)] text-rurikon-600 font-serif leading-normal eb-garamond-placeholder',
+            'placeholder:text-rurikon-300 placeholder:italic placeholder:text-[clamp(0.95rem,1.7vw,1rem)]',
+            'cursor-text caret-rurikon-600 overflow-y-auto transition-all duration-300 ease-out',
+          )}
           name="message"
           autoComplete="off"
           maxLength={MAX_MESSAGE_LENGTH}
@@ -181,7 +187,7 @@ export function ContactForm() {
             disabled={!email.trim() || !message.trim() || isPending || status === 'success'}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            className="text-[clamp(0.9rem,1.6vw,1rem)] text-rurikon-600 hover:text-[#B85252] font-serif eb-garamond-italic transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed inline-flex items-center gap-[clamp(0.2rem,0.8vw,0.25rem)]"
+            className="text-[clamp(0.9rem,1.6vw,1rem)] text-rurikon-600 hover:text-link-hover font-serif eb-garamond-italic transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed inline-flex items-center gap-[clamp(0.2rem,0.8vw,0.25rem)]"
             aria-label={status === 'success' ? 'Message sent' : isPending ? 'Sending message' : 'Send message'}
           >
             <span className="inline-flex items-center transition-all duration-300 ease-out opacity-90" aria-hidden>

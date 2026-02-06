@@ -1,7 +1,12 @@
 import { Fragment } from 'react'
 
+interface StaggerTitleProps {
+  text: string
+  end?: string
+}
+
 // Title animation - uses nth-child for delays
-export function StaggerTitle({ text, end = '.' }: { text: string; end?: string }) {
+export function StaggerTitle({ text, end = '.' }: StaggerTitleProps) {
   const words = text.split(' ')
   return (
     <>
@@ -19,7 +24,7 @@ export function StaggerTitle({ text, end = '.' }: { text: string; end?: string }
 // Body text animation - uses inline delays
 type Item = string | { text: string; href?: string; className?: string }
 
-type StaggerProps = {
+interface StaggerProps {
   start: number
   step?: number
   items: Item[]

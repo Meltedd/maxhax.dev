@@ -1,12 +1,11 @@
 import cn from 'clsx'
 
-export function BlockSideTitle({
-  title,
-  children,
-}: {
+interface BlockSideTitleProps {
   title: React.ReactNode
   children: React.ReactNode
-}) {
+}
+
+export function BlockSideTitle({ title, children }: BlockSideTitleProps) {
   return (
     <figure className='my-9'>
       <span className='inline-block w-full'>

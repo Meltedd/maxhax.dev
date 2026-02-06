@@ -6,9 +6,9 @@ import localFont from 'next/font/local'
 import { EB_Garamond } from 'next/font/google'
 import 'katex/dist/katex.min.css'
 
-import Navbar from '@/components/navbar'
-import { ErrorBoundaryWrapper } from '@/components/error-boundary-wrapper'
-import { NavigationWrapper } from './navigation-wrapper'
+import { Navbar } from '@/components/Navbar'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { NavigationWrapper } from '@/components/NavigationWrapper'
 import './globals.css'
 
 const ebGaramond = EB_Garamond({
@@ -83,11 +83,11 @@ export default function RootLayout({
           <Navbar />
           <main className='relative flex-1 max-w-8xl [contain:inline-size]'>
             <div className='hidden mobile:block absolute left-0 w-px h-full opacity-100 bg-rurikon-border' />
-            <ErrorBoundaryWrapper>
+            <ErrorBoundary>
               <NavigationWrapper>
                 {children}
               </NavigationWrapper>
-            </ErrorBoundaryWrapper>
+            </ErrorBoundary>
           </main>
         </div>
         <Analytics />

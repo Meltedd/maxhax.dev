@@ -1,6 +1,6 @@
 import withMDX from '@next/mdx'
 import { NextConfig } from 'next'
-import './server-setup.js'
+import './server-setup'
 
 export default withMDX()({
   pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],

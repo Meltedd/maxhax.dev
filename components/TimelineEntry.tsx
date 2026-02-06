@@ -1,5 +1,10 @@
 import type { TimelineEntry as TimelineEntryData, TimelineBodyPart } from './timeline-data'
 
+interface TimelineEntryProps {
+  entry: TimelineEntryData
+  delay: number
+}
+
 const linkClass = 'underline decoration-1 underline-offset-4 font-semibold italic'
 
 function renderBodyPart(part: TimelineBodyPart, index: number) {
@@ -14,7 +19,7 @@ function renderBodyPart(part: TimelineBodyPart, index: number) {
   )
 }
 
-export function TimelineEntry({ entry, delay }: { entry: TimelineEntryData; delay: number }) {
+export function TimelineEntry({ entry, delay }: TimelineEntryProps) {
   return (
     <div
       className='timeline-entry stagger-timeline-entry'

@@ -35,7 +35,7 @@ function Item(props: React.ComponentProps<typeof Link>) {
   )
 }
 
-export default function Navbar() {
+export function Navbar() {
   return (
     <nav className='w-full px-[clamp(1.5rem,3vw,3.5rem)] border-b border-rurikon-border/50 mobile:px-0 mobile:border-b-0 mobile:mr-[clamp(1.5rem,2.5vw,3.5rem)] mobile:w-28'>
       <ul className='text-[clamp(0.95rem,0.45vw+0.9rem,1.2rem)] flex gap-[clamp(1rem,1.5vw,1.25rem)] justify-start items-center pb-[clamp(1.75rem,2.5vw,2.5rem)] mobile:pb-4 mobile:flex-col mobile:items-end mobile:justify-start mobile:block mobile:text-right mobile:sticky mobile:top-[clamp(2rem,3vw,4rem)] mobile:space-y-[clamp(0.75rem,1.5vw,1rem)] mobile:gap-0 eb-garamond-italic'>

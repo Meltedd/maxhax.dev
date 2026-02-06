@@ -1,0 +1,56 @@
+/* Code */
+code {
+  font-family: var(--mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, 'Liberation Mono', 'Courier New', monospace;
+  word-spacing: -0.15em;
+  background: transparent;
+  --shiki-token-comment: hsl(30deg 8% 48% / 0.65);
+  --shiki-token-punctuation: hsl(30deg 6% 44% / 0.75);
+  --shiki-token-operator: hsl(30deg 8% 44% / 0.8);
+  --shiki-token-variable: hsl(30deg 12% 46%);
+  --shiki-token-parameter: hsl(30deg 15% 48%);
+  --shiki-token-constant: hsl(30deg 35% 48%);
+  --shiki-token-number: hsl(30deg 35% 48%);
+  --shiki-token-escape: hsl(30deg 30% 48%);
+  --shiki-token-keyword: hsl(25deg 30% 48%);
+  --shiki-token-type: hsl(25deg 25% 48%);
+  --shiki-token-function: hsl(180deg 25% 46%);
+  --shiki-token-link: hsl(180deg 25% 46%);
+  --shiki-token-property: hsl(180deg 20% 46%);
+  --shiki-token-string: hsl(150deg 20% 44%);
+  --shiki-token-string-expression: hsl(150deg 20% 44%);
+  --shiki-token-regex: hsl(150deg 22% 45%);
+  --shiki-token-class-name: hsl(20deg 18% 48%);
+}
+
+code span { transition: color 0.2s; }
+
+pre {
+  --shiki-foreground: var(--color-code-fg);
+  --shiki-background: transparent;
+  background-color: var(--color-code-bg);
+  border: 1px solid var(--color-code-border);
+  border-radius: 6px;
+  container-type: inline-size;
+  overflow-x: auto;
+  padding: clamp(0.75rem, 1.8vw, 1.8rem);
+  margin: 2.25rem 0;
+  -webkit-font-smoothing: auto;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+pre code {
+  display: block;
+  padding: 0;
+  line-height: 1.5;
+  font-size: clamp(0.85rem, 1.5cqw, 1.05rem);
+  white-space: pre;
+}
+
+@media (max-width: 640px) {
+  pre code {
+    font-size: clamp(0.8rem, 1.8cqw, 1rem);
+    line-height: 1.4;
+  }
+}

@@ -1,0 +1,58 @@
+/* Typography */
+h1 {
+  font-size: clamp(2rem, 5.2vw, 4.5rem);
+  line-height: clamp(1.05em, calc(1.05em + 0.2vw), 1.15em);
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: clamp(1.25rem, 2vw, 2.25rem);
+  font-variation-settings: 'wght' 400, var(--sans-variation);
+  line-height: clamp(1.15em, calc(1.15em + 0.15vw), 1.25em);
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: clamp(1.05rem, 1.5vw, 1.5rem);
+  line-height: clamp(1.2em, calc(1.2em + 0.15vw), 1.3em);
+  letter-spacing: -0.005em;
+}
+
+i, em, blockquote, nav, .sidenote, .font-serif {
+  font-family: var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-variant-ligatures: contextual;
+  letter-spacing: -0.003em;
+  line-height: 1.5;
+}
+
+.font-serif {
+  font-family: var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif;
+  font-optical-sizing: auto;
+  font-variation-settings: 'wght' 400;
+  letter-spacing: -0.005em;
+}
+
+.font-serif.font-light {
+  font-variation-settings: 'wght' 300;
+  letter-spacing: -0.008em;
+}
+
+.font-serif.font-medium {
+  font-variation-settings: 'wght' 500;
+}
+
+.eb-garamond-italic {
+  font-family: 'EB Garamond', var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif !important;
+  font-style: italic !important;
+}
+
+h1.eb-garamond-italic {
+  font-weight: 800 !important;
+}
+
+.text-rurikon-300.italic {
+  font-style: italic !important;
+  font-family: var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif !important;
+}

@@ -3,14 +3,19 @@
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { RHAP_UI } from 'react-h5-audio-player'
-import './music-player.css'
+import './MusicPlayer.css'
+
+interface MusicPlayerProps {
+  src: string
+  title: string
+}
 
 const AudioPlayer = dynamic(() => import('react-h5-audio-player'), {
   ssr: false,
   loading: () => <div className="music-player-placeholder">Loading player...</div>,
 })
 
-export function MusicPlayer({ src, title }: { src: string; title: string }) {
+export function MusicPlayer({ src, title }: MusicPlayerProps) {
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {

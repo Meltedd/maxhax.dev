@@ -4,7 +4,11 @@ import { useRef, useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import cn from 'clsx'
 
-export function NavigationWrapper({ children }: { children: React.ReactNode }) {
+interface NavigationWrapperProps {
+  children: React.ReactNode
+}
+
+export function NavigationWrapper({ children }: NavigationWrapperProps) {
   const hasNavigated = useRef(false)
   const [skipAnims, setSkipAnims] = useState(false)
   const pathname = usePathname()
