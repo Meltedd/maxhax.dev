@@ -1,5 +1,5 @@
 // Server-side localStorage polyfill for Next.js devtools compatibility
-if (typeof window === 'undefined' && typeof globalThis !== 'undefined') {
+if (typeof window === 'undefined') {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const storageShim: Storage = {
     getItem(_key: string) { return null },
