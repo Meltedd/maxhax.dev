@@ -14,8 +14,8 @@ export default withMDX()({
   headers: async () => {
     const isDev = process.env.NODE_ENV === 'development'
     const csp = isDev
-      ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://vercel.live https://api.iconify.design https://api.unisvg.com https://api.simplesvg.com https://va.vercel-scripts.com ws: wss:;"
-      : "default-src 'self'; script-src 'self' 'unsafe-inline' https://vercel.live https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://vercel.live https://api.iconify.design https://api.unisvg.com https://api.simplesvg.com https://va.vercel-scripts.com;"
+      ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://vercel.live https://api.iconify.design https://api.unisvg.com https://api.simplesvg.com https://va.vercel-scripts.com ws: wss:; base-uri 'none'; form-action 'self'; object-src 'none';"
+      : "default-src 'self'; script-src 'self' 'unsafe-inline' https://vercel.live https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://vercel.live https://api.iconify.design https://api.unisvg.com https://api.simplesvg.com https://va.vercel-scripts.com; base-uri 'none'; form-action 'self'; object-src 'none';"
 
     return [
       {
