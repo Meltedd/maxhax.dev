@@ -48,7 +48,8 @@ export async function isRateLimited(ip: string | undefined): Promise<boolean> {
   try {
     const { success } = await rl.limit(ip)
     return !success
-  } catch {
+  } catch (err) {
+    console.error('Rate limit check failed:', err)
     return false
   }
 }
