@@ -8,6 +8,15 @@ export const metadata = {
 
 export const dynamic = 'force-static'
 
+/** Parse a `YYYY.MM.DD` date string into a numeric sort key (YYYYMMDD), or 0 if malformed. */
+function dateSortKey(date: string): number {
+  const parts = date.split('.')
+  if (parts.length !== 3) return 0
+  const [y, m, d] = parts.map(Number)
+  if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return 0
+  return y * 10000 + m * 100 + d
+}
+
 const articlesDirectory = path.join(
   process.cwd(),
   'app',
@@ -28,12 +37,7 @@ export default async function Page() {
       slug: article.replace(/\.mdx$/, ''),
       title: articleModule.metadata.title,
       date: articleModule.metadata.date || '-',
-      sort: articleModule.metadata.date
-        ? (() => {
-            const [y, m, d] = articleModule.metadata.date.split('.')
-            return Number(y) * 10000 + Number(m) * 100 + Number(d)
-          })()
-        : 0,
+      sort: articleModule.metadata.date ? dateSortKey(articleModule.metadata.date) : 0,
     })
   }
 
