@@ -29,7 +29,10 @@ export default async function Page() {
       title: articleModule.metadata.title,
       date: articleModule.metadata.date || '-',
       sort: articleModule.metadata.date
-        ? new Date(articleModule.metadata.date.replaceAll('.', '-')).getTime()
+        ? (() => {
+            const [y, m, d] = articleModule.metadata.date.split('.')
+            return Number(y) * 10000 + Number(m) * 100 + Number(d)
+          })()
         : 0,
     })
   }
