@@ -103,6 +103,7 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
   })
   const decayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const scrambledDigitsRef = useRef(new Map<number, { value: string; time: number }>())
+  const isScramblingRef = useRef(false)
   const numDigitsRef = useRef(numDigits)
   numDigitsRef.current = numDigits
 
@@ -139,8 +140,8 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
       const year = entry.dataset.year
       if (!year) return
       const rect = entry.getBoundingClientRect()
-      const top = rect.top + scrollY
-      const bottom = rect.bottom + scrollY
+      const top = rect.top + window.scrollY
+      const bottom = rect.bottom + window.scrollY
       const existing = sectionMap.get(year)
       if (existing) {
         existing.start = Math.min(existing.start, top)
@@ -152,14 +153,14 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
 
     state.sections = Array.from(sectionMap.values())
     state.stickyOffset = stickyRef.current?.offsetHeight || 0
-    state.docHeight = document.documentElement.scrollHeight - innerHeight
+    state.docHeight = document.documentElement.scrollHeight - window.innerHeight
   }
 
   const updateStickyYear = () => {
     const { sections, stickyOffset, docHeight } = scrollStateRef.current
     if (!sections.length) return
 
-    const scrollPos = scrollY + stickyOffset
+    const scrollPos = window.scrollY + stickyOffset
     const maxScrollPos = docHeight + stickyOffset
 
     if (scrollPos <= sections[0].start) {
@@ -202,13 +203,17 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
 
     if (state.momentum < MIN_INTENSITY) {
       setDisplayString(base)
-      if (scramblingIndices.size > 0) setScramblingIndices(new Set())
+      if (isScramblingRef.current) {
+        setScramblingIndices(new Set())
+        isScramblingRef.current = false
+      }
       return
     }
 
     const result = scrambleDigits(base, state.momentum, scrollY, state.docHeight, scrambledDigitsRef.current)
     setDisplayString(result.display)
     setScramblingIndices(result.indices)
+    isScramblingRef.current = result.indices.size > 0
 
     if (result.changed.length) {
       setDigitChangeKeys((prev) => {
@@ -234,6 +239,7 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
       } else {
         state.momentum = 0
         setScramblingIndices(new Set())
+        isScramblingRef.current = false
         renderBinary(state.lastY)
         decayTimeoutRef.current = null
       }
