@@ -13,7 +13,6 @@ export function ContactForm() {
   const [website, setWebsite] = useState('') // honeypot
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
-  const [isHovered, setIsHovered] = useState(false)
   const [isPending, startTransition] = useTransition()
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -185,9 +184,7 @@ export function ContactForm() {
           <button
             type="submit"
             disabled={!email.trim() || !message.trim() || isPending || status === 'success'}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            className="text-[clamp(0.9rem,1.6vw,1rem)] text-rurikon-600 hover:text-link-hover font-serif eb-garamond-italic transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed inline-flex items-center gap-[clamp(0.2rem,0.8vw,0.25rem)]"
+            className="group text-[clamp(0.9rem,1.6vw,1rem)] text-rurikon-600 hover:text-link-hover font-serif eb-garamond-italic transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed inline-flex items-center gap-[clamp(0.2rem,0.8vw,0.25rem)]"
             aria-label={status === 'success' ? 'Message sent' : isPending ? 'Sending message' : 'Send message'}
           >
             <span className="inline-flex items-center transition-all duration-300 ease-out opacity-90" aria-hidden>
@@ -196,7 +193,12 @@ export function ContactForm() {
               </svg>
             </span>
             <span>{status === 'success' ? 'sent' : isPending ? 'sending' : 'send'}</span>
-            <span className={`transition-all duration-300 ease-out ${isHovered && status === 'idle' && !isPending ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2'}`}>
+            <span
+              className={cn(
+                'transition-all duration-300 ease-out opacity-0 -translate-x-2',
+                status === 'idle' && !isPending && 'group-hover:opacity-100 group-hover:translate-x-0'
+              )}
+            >
               →
             </span>
           </button>
