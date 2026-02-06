@@ -28,7 +28,9 @@ export default async function Page() {
       slug: article.replace(/\.mdx$/, ''),
       title: articleModule.metadata.title,
       date: articleModule.metadata.date || '-',
-      sort: Number(articleModule.metadata.date?.replaceAll('.', '') || 0),
+      sort: articleModule.metadata.date
+        ? new Date(articleModule.metadata.date.replaceAll('.', '-')).getTime()
+        : 0,
     })
   }
 
