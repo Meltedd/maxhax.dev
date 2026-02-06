@@ -1,11 +1,9 @@
 'use server'
 
-import { headers } from 'next/headers'
 import { Resend } from 'resend'
-import { isRateLimited } from './rate-limit'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
-const CONTACT_EMAIL = process.env.CONTACT_EMAIL!
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL
 
 const MAX_SUBJECT_LENGTH = 200
 const MAX_MESSAGE_LENGTH = 5000
@@ -33,13 +31,6 @@ export async function sendContactEmail(
   if (!CONTACT_EMAIL || !process.env.RESEND_API_KEY) {
     console.error('Missing CONTACT_EMAIL or RESEND_API_KEY environment variables')
     return { success: false, error: 'Server configuration error' }
-  }
-
-  const headersList = await headers()
-  // First address in x-forwarded-for chain is the original client
-  const ip = headersList.get('x-forwarded-for')?.split(',')[0].trim()
-  if (ip && isRateLimited(ip)) {
-    return { success: false, error: 'Too many requests. Please try again later.' }
   }
 
   try {
