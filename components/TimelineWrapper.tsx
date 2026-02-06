@@ -312,13 +312,9 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
     }
 
     // Defer initial measurements until after first paint so layout is settled
-    setTimeout(syncSpans, 100)
+    const initTimeout = setTimeout(syncSpans, 100)
     requestAnimationFrame(() => {
       callbacks.current.updateMeasurements()
-      const { sections } = scrollStateRef.current
-      if (sections.length > 0) {
-        setYearIfChanged(sections[0].year, sections[1]?.year ?? sections[0].year, 0)
-      }
       callbacks.current.updateFromScroll(window.scrollY, Date.now())
     })
 
@@ -326,6 +322,7 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
     window.addEventListener('resize', handleResize)
 
     return () => {
+      clearTimeout(initTimeout)
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('resize', handleResize)
       if (decayTimeoutRef.current) clearTimeout(decayTimeoutRef.current)
