@@ -5,7 +5,6 @@ export type TimelineBodyPart =
 export type TimelineEntry = {
   year: string
   month: string
-  delay: number
   body: TimelineBodyPart[]
 }
 
@@ -13,32 +12,16 @@ export const timelineEntries: TimelineEntry[] = [
   {
     year: '2020',
     month: '2019-2020',
-    delay: 0.12,
     body: [
       {
         type: 'text',
-        text: 'Self-taught Python, C#, Java, C++, web dev during COVID lockdown. Freshman/sophomore year of high school. Virtual classes meant a lot of time to code.',
+        text: 'Self-taught Python, C#, Java, C++, and web dev during COVID lockdown. Freshman/sophomore year of high school.',
       },
-    ],
-  },
-  {
-    year: '2021',
-    month: 'Jan 2021',
-    delay: 0.3,
-    body: [
-      { type: 'text', text: 'Joined ' },
-      {
-        type: 'link',
-        text: 'HackForums',
-        href: 'https://hackforums.net/member.php?action=profile&uid=4922164',
-      },
-      { type: 'text', text: '.' },
     ],
   },
   {
     year: '2021',
     month: 'Feb 2021',
-    delay: 0.48,
     body: [
       {
         type: 'text',
@@ -49,7 +32,6 @@ export const timelineEntries: TimelineEntry[] = [
   {
     year: '2021',
     month: 'Mar 2021',
-    delay: 0.66,
     body: [
       { type: 'text', text: 'Signed up to ' },
       { type: 'link', text: 'crackmes', href: 'https://crackmes.one/' },
@@ -65,7 +47,6 @@ export const timelineEntries: TimelineEntry[] = [
   {
     year: '2021',
     month: 'Sep 2021',
-    delay: 0.84,
     body: [
       { type: 'text', text: 'Fixed, modernized, and reconstructed HVNC in ' },
       { type: 'link', text: 'Tinynuke', href: 'https://github.com/rossja/TinyNuke' },
@@ -80,76 +61,16 @@ export const timelineEntries: TimelineEntry[] = [
   {
     year: '2022',
     month: 'Jan 2022',
-    delay: 1.02,
     body: [
       {
         type: 'text',
-        text: 'Developed process hollowing with parent PID spoofing (C#). Spawns hollowed process as child of explorer.exe instead of your loader.',
-      },
-    ],
-  },
-  {
-    year: '2022',
-    month: 'Feb 2022',
-    delay: 1.2,
-    body: [
-      { type: 'text', text: 'Joined ' },
-      { type: 'link', text: 'HackTheBox', href: 'https://hackthebox.com' },
-      { type: 'text', text: '.' },
-    ],
-  },
-  {
-    year: '2022',
-    month: 'Feb 2022',
-    delay: 1.38,
-    body: [
-      {
-        type: 'text',
-        text: 'Began to practice penetration testing / offensive security. Pwned 6 machines on HTB throughout this month.',
-      },
-    ],
-  },
-  {
-    year: '2022',
-    month: 'Jun 2022',
-    delay: 1.56,
-    body: [
-      {
-        type: 'text',
-        text: 'Truly enjoying pentesting; I fell in love with the creative process. Pwned another 9 machines (15 total) this month.',
-      },
-    ],
-  },
-  {
-    year: '2022',
-    month: 'Sep 2022',
-    delay: 1.74,
-    body: [
-      { type: 'text', text: '1,250+ followers on ' },
-      {
-        type: 'link',
-        text: 'HackForums',
-        href: 'https://hackforums.net/member.php?action=profile&uid=4922164',
-      },
-      { type: 'text', text: '. 30+ sales, 100% positive. Earned thousands in generated revenue.' },
-    ],
-  },
-  {
-    year: '2023',
-    month: 'Jan 2023',
-    delay: 1.92,
-    body: [
-      { type: 'link', text: 'HVNC', href: 'https://github.com/Meltedd/HVNC' },
-      {
-        type: 'text',
-        text: ' project gaining in popularity in the open source community. Security researchers and professors started reaching out.',
+        text: 'Built a process hollowing loader with PPID spoofing (C#). Hollowed processes spawned under explorer.exe to break parent-child chain analysis.',
       },
     ],
   },
   {
     year: '2023',
     month: 'Mar 2023',
-    delay: 2.1,
     body: [
       { type: 'text', text: 'Reverse engineered live malware from ' },
       {
@@ -170,60 +91,7 @@ export const timelineEntries: TimelineEntry[] = [
   },
   {
     year: '2023',
-    month: 'Dec 2023',
-    delay: 2.28,
-    body: [
-      { type: 'text', text: 'Official ' },
-      { type: 'link', text: 'Cobalt Strike module', href: 'https://github.com/WKL-Sec/HiddenDesktop' },
-      {
-        type: 'text',
-        text: ' adapted from my HVNC project. My open source work is now being used in commercial offensive security tooling.',
-      },
-    ],
-  },
-  {
-    year: '2024',
-    month: 'Jan 2024',
-    delay: 2.46,
-    body: [
-      { type: 'text', text: 'Starting teaching position at ' },
-      { type: 'link', text: 'The Coding Place', href: 'https://www.thecodingplace.com/' },
-      {
-        type: 'text',
-        text: ' - Python/Java/C++ for K-12 students. Turns out explaining pointers to 12 year olds can be harder than reversing malware.',
-      },
-    ],
-  },
-  {
-    year: '2025',
-    month: 'Apr 2025',
-    delay: 2.64,
-    body: [
-      { type: 'text', text: 'Started at ' },
-      { type: 'link', text: 'Think Big Technology', href: 'https://www.thinkbigtechnology.com/' },
-      {
-        type: 'text',
-        text: ' as an IT Security Engineer. Managing security ops for two client organizations - quarterly internal penetration tests, incident response, infrastructure monitoring. Mentoring an intern on SOC operations.',
-      },
-    ],
-  },
-  {
-    year: '2025',
-    month: 'May 2025',
-    delay: 2.82,
-    body: [
-      { type: 'text', text: 'Independently prototyped and developed an LLM-powered SEO analysis product for ' },
-      { type: 'link', text: 'Think Big Technology', href: 'https://www.thinkbigtechnology.com/' },
-      {
-        type: 'text',
-        text: ', integrating a Next.js frontend with a Flask + SQLAlchemy backend. Wrote over 9,000 lines of TypeScript and Python, designed UI/UX.',
-      },
-    ],
-  },
-  {
-    year: '2025',
-    month: 'Jun 2025',
-    delay: 3.0,
+    month: '2023',
     body: [
       { type: 'text', text: 'Built ' },
       { type: 'link', text: 'VisualSploit', href: 'https://github.com/Meltedd/VisualSploit' },
@@ -234,26 +102,73 @@ export const timelineEntries: TimelineEntry[] = [
     ],
   },
   {
-    year: '2025',
-    month: 'Aug 2025',
-    delay: 3.18,
+    year: '2023',
+    month: 'Dec 2023',
     body: [
+      { type: 'text', text: 'Official ' },
+      { type: 'link', text: 'Cobalt Strike module', href: 'https://github.com/WKL-Sec/HiddenDesktop' },
       {
         type: 'text',
-        text: 'Developed PowerSploit (C#) to build in-memory PowerShell loaders which use RunPE + obfuscation to execute .NET payloads. Bypassed AV runtime and scantime detection. Github repo coming soon...',
+        text: ' adapted from my HVNC project. Open source work making its way into commercial offensive security tooling.',
+      },
+    ],
+  },
+  {
+    year: '2024',
+    month: 'Jun 2024–Jan 2025',
+    body: [
+      { type: 'text', text: 'Taught at ' },
+      { type: 'link', text: 'The Coding Place', href: 'https://www.thecodingplace.com/' },
+      {
+        type: 'text',
+        text: ' - Python/Java/C++ for K-12 students. Turned out explaining pointers to 12-year-olds could be harder than reversing malware.',
       },
     ],
   },
   {
     year: '2025',
-    month: 'Sep 2025',
-    delay: 3.36,
+    month: 'May–Dec 2025',
     body: [
-      { type: 'text', text: 'Currently studying for CompTIA ' },
-      { type: 'link', text: 'Security+', href: 'https://www.comptia.org/en-us/certifications/security/' },
-      { type: 'text', text: ' and ' },
-      { type: 'link', text: 'Network+', href: 'https://www.comptia.org/en-us/certifications/network/' },
-      { type: 'text', text: ' certifications, completing college coursework. Open to freelance work.' },
+      { type: 'text', text: 'IT Security Engineer at ' },
+      { type: 'link', text: 'Think Big Technology', href: 'https://www.thinkbigtechnology.com/' },
+      {
+        type: 'text',
+        text: '. Managed security ops for two client organizations - quarterly internal penetration tests, incident response, infrastructure monitoring. Mentored an intern on SOC operations.',
+      },
+    ],
+  },
+  {
+    year: '2025',
+    month: 'Dec 2025',
+    body: [
+      { type: 'text', text: 'Joined ' },
+      { type: 'link', text: 'HackerOne', href: 'https://hackerone.com/0xmaxhax' },
+      { type: 'text', text: '.' },
+    ],
+  },
+  {
+    year: '2025',
+    month: 'Dec 2025',
+    body: [
+      { type: 'text', text: 'Found a high-severity vulnerability in Netflix production systems ($5,100 bounty).' },
+    ],
+  },
+  {
+    year: '2026',
+    month: '2026',
+    body: [
+      { type: 'text', text: 'Found a DoS vulnerability in Node.js TLS error handling (' },
+      { type: 'link', text: 'CVE-2026-21637', href: 'https://nvd.nist.gov/vuln/detail/CVE-2026-21637' },
+      { type: 'text', text: ', ~$1,000 bounty).' },
+    ],
+  },
+  {
+    year: '2026',
+    month: '2026',
+    body: [
+      { type: 'text', text: 'Reached 99th percentile on ' },
+      { type: 'link', text: 'HackerOne', href: 'https://hackerone.com/0xmaxhax' },
+      { type: 'text', text: ' with a 7.00 signal rating.' },
     ],
   },
 ]

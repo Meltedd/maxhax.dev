@@ -11,22 +11,19 @@ export const dynamic = 'force-static'
 
 <div className="whoami-header">
   <h1 className="text-4xl sm:text-5xl font-bold text-rurikon-700 mb-3 tracking-tight eb-garamond-italic">Whoami</h1>
-  <p className="text-rurikon-400 mb-8 text-lg eb-garamond-italic">Security researcher, full-stack developer. I reverse engineer malware, build exploits, and break things professionally.</p>
+  <p className="text-rurikon-400 mb-8 text-lg eb-garamond-italic">Security researcher. I build exploits, reverse engineer malware, and break things professionally.</p>
 </div>
 
 <TimelineWrapper>
   {(() => {
+    const BASE_DELAY = 0.12
+    const DELAY_STEP = 0.18
     const reversedEntries = [...timelineEntries].reverse()
-    const originalDelays = timelineEntries.map((entry) => entry.delay)
 
     return reversedEntries.map((entry, index) => {
       const previousYear = index === 0 ? null : reversedEntries[index - 1]?.year
       const showYearMarker = entry.year !== previousYear
       const key = `${entry.year}-${entry.month}-${index}`
-      const entryWithDelay = {
-        ...entry,
-        delay: originalDelays[index] ?? entry.delay,
-      }
 
       return (
         <Fragment key={key}>
@@ -35,7 +32,7 @@ export const dynamic = 'force-static'
               <span className="year-label">{entry.year}</span>
             </div>
           )}
-          <TimelineEntry entry={entryWithDelay} />
+          <TimelineEntry entry={entry} delay={BASE_DELAY + index * DELAY_STEP} />
         </Fragment>
       )
     })

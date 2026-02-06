@@ -67,7 +67,7 @@ export function ContactForm() {
             />
             <nav aria-label="Social links" className="flex items-center gap-[clamp(0.5rem,1.5vw,0.75rem)] text-rurikon-300 text-[clamp(0.85rem,1.5vw,0.96rem)] shrink-0">
               <a
-                href="https://www.linkedin.com/in/max-harari-b35231359/"
+                href="https://www.linkedin.com/in/maxhax"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
@@ -78,6 +78,20 @@ export function ContactForm() {
                   <path d="M20.451 20.452h-3.554v-5.569c0-1.329-.024-3.038-1.852-3.038-1.853 0-2.136 1.447-2.136 2.943v5.664H9.355V9h3.414v1.561h.048c.476-.9 1.637-1.852 3.366-1.852 3.6 0 4.267 2.369 4.267 5.451v6.292zM5.337 7.433a2.062 2.062 0 110-4.124 2.062 2.062 0 010 4.124zM7.116 20.452H3.554V9h3.562v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.226.792 24 1.771 24h20.451C23.2 24 24 23.226 24 22.271V1.729C24 .774 23.2 0 22.225 0z" />
                 </svg>
                 <span className="hidden lg:inline">LinkedIn</span>
+              </a>
+              <span className="hidden lg:inline text-rurikon-200">·</span>
+              <a
+                href="https://hackerone.com/0xmaxhax"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="HackerOne"
+                draggable={false}
+                className="inline-flex items-center gap-[clamp(0.25rem,1vw,0.5rem)] underline decoration-1 underline-offset-[0.25em] eb-garamond-italic hover:text-rurikon-700 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-[0.9em] w-[0.9em]">
+                  <path d="M7.207 0c-.4836 0-.8717.0981-1.1683.3007-.3044.2003-.4592.4627-.4592.7798v21.809c0 .2766.1581.5277.4752.7609.315.2335.7031.3501 1.1664.3501.4427 0 .8306-.1166 1.1678-.3501.3352-.231.5058-.4843.5058-.761V1.0815c0-.319-.1623-.5769-.4893-.7813C8.0644.1018 7.6702 0 7.207 0zm9.5234 8.662c-.4836 0-.8717.0981-1.1683.3007l-4.439 2.7822c-.1988.1861-.2841.4687-.2473.855.0342.3826.2108.747.5238 1.0907.3145.346.6662.5626 1.0684.6547.3963.0899.6973.041.8962-.143l1.7551-1.0951v9.7817c0 .2767.1522.5278.4607.761.3007.2335.6873.3501 1.1504.3501.463 0 .863-.1166 1.1983-.3501.3371-.2332.5058-.4843.5058-.761V9.7381c0-.3193-.165-.577-.4898-.7754-.3252-.2026-.7288-.3007-1.2143-.3007z" />
+                </svg>
+                <span className="hidden lg:inline">HackerOne</span>
               </a>
               <span className="hidden lg:inline text-rurikon-200">·</span>
               <a

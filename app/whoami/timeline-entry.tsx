@@ -14,11 +14,11 @@ function renderBodyPart(part: TimelineBodyPart, index: number) {
   )
 }
 
-export function TimelineEntry({ entry }: { entry: TimelineEntryData }) {
+export function TimelineEntry({ entry, delay }: { entry: TimelineEntryData; delay: number }) {
   return (
     <div
       className='timeline-entry stagger-timeline-entry'
-      style={{ animationDelay: `${entry.delay}s` }}
+      style={{ animationDelay: `${delay}s` }}
       data-year={entry.year}
     >
       <div className='entry-connector' />

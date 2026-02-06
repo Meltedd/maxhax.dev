@@ -29,6 +29,13 @@ function isLink(item: Item): item is { text: string; href: string; className?: s
   return typeof item === 'object' && 'href' in item
 }
 
+function nextStartsWithPunctuation(items: Item[], i: number): boolean {
+  const next = items[i + 1]
+  if (!next) return false
+  const text = typeof next === 'string' ? next : next.text
+  return /^[.,;:!?)'\]"]/.test(text)
+}
+
 export function Stagger({ start, step = 0.01, items }: StaggerProps) {
   let wordIndex = 0
 
@@ -78,7 +85,7 @@ export function Stagger({ start, step = 0.01, items }: StaggerProps) {
         return (
           <Fragment key={i}>
             {rendered}
-            {i < items.length - 1 && !isLink(items[i]) && ' '}
+            {i < items.length - 1 && !(isLink(items[i]) && nextStartsWithPunctuation(items, i)) && ' '}
           </Fragment>
         )
       })}
