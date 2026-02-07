@@ -23,7 +23,7 @@ export function NavigationWrapper({ children }: NavigationWrapperProps) {
   return (
     <article
       className={cn(
-        'pl-[clamp(1.5rem,3vw,3.5rem)] pt-8 mobile:pt-4 mobile:pl-8 sm:pl-12 md:pl-16',
+        'px-[clamp(1.5rem,3vw,3.5rem)] pt-8 mobile:pt-4 mobile:pl-8 mobile:pr-0 sm:pl-12 md:pl-16',
         skipAnims && 'skip-animations'
       )}
     >
