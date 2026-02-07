@@ -85,7 +85,7 @@ export function Stagger({ start, step = 0.01, items }: StaggerProps) {
           )
         })
 
-        const suppressSpace = isLink(items[i]) && nextStartsWithPunctuation(items, i)
+        const suppressSpace = nextStartsWithPunctuation(items, i)
 
         return (
           <Fragment key={i}>
