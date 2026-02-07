@@ -44,7 +44,7 @@ export default async function Page() {
   items.sort((a, b) => b.sort - a.sort)
 
   return (
-    <div className="max-w-[66ch] mobile:max-w-[min(66ch,50vw)]">
+    <div className="max-w-[66ch] mobile:max-w-[min(66ch,60vw)]">
       <h1 className="text-4xl sm:text-5xl font-bold text-rurikon-700 mb-6 tracking-tight eb-garamond-italic">
         Thoughts
       </h1>

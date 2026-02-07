@@ -31,5 +31,5 @@
 }
 
 @media (min-width: 480px) {
-  .whoami-header { max-width: min(66ch, 50vw); }
+  .whoami-header { max-width: min(66ch, 60vw); }
 }

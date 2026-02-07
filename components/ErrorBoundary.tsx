@@ -34,7 +34,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       }
 
       return (
-        <div className="max-w-[min(66ch,50vw)] p-8">
+        <div className="max-w-[min(66ch,60vw)] p-8">
           <h1 className="text-2xl font-bold mb-4 text-rurikon-700">Something went wrong</h1>
           <p className="text-rurikon-600 mb-4">
             An unexpected error occurred. Please try refreshing the page.

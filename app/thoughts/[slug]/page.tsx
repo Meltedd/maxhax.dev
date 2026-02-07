@@ -30,7 +30,7 @@ export default async function Page({ params }: PageProps) {
   return (
     <div
       className={cn(
-        'thought-article max-w-[66ch] mobile:max-w-[min(66ch,50vw)] space-y-[clamp(1rem,1.6vw,1.75rem)] text-[clamp(0.95rem,0.65vw+0.95rem,1.25rem)]',
+        'thought-article max-w-[66ch] mobile:max-w-[min(66ch,60vw)] space-y-[clamp(1rem,1.6vw,1.75rem)] text-[clamp(0.95rem,0.65vw+0.95rem,1.25rem)]',
       )}
       lang='en'
     >
