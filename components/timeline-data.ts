@@ -115,7 +115,7 @@ export const timelineEntries: TimelineEntry[] = [
   },
   {
     year: '2024',
-    month: 'Jun 2024–Jan 2025',
+    month: 'Jun 2024-Jan 2025',
     body: [
       { type: 'text', text: 'Taught at ' },
       { type: 'link', text: 'The Coding Place', href: 'https://www.thecodingplace.com/' },
@@ -127,7 +127,7 @@ export const timelineEntries: TimelineEntry[] = [
   },
   {
     year: '2025',
-    month: 'May–Dec 2025',
+    month: 'May-Dec 2025',
     body: [
       { type: 'text', text: 'IT Security Engineer at ' },
       { type: 'link', text: 'Think Big Technology', href: 'https://www.thinkbigtechnology.com/' },

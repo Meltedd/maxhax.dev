@@ -215,7 +215,7 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
     state.lastTime = timestamp
 
     if (binaryLineRef.current) {
-      binaryLineRef.current.style.transform = `translateY(-${scrollY * 0.4}px)`
+      binaryLineRef.current.style.transform = `translateX(-50%) translateY(-${scrollY * 0.4}px)`
     }
     callbacks.current.updateStickyYear()
     callbacks.current.renderBinary(scrollY)
@@ -229,8 +229,8 @@ export function TimelineWrapper({ children }: TimelineWrapperProps) {
     const syncSpans = () => {
       const container = binaryLineRef.current
       if (!container) return
-      const entries = document.querySelectorAll('.timeline-entry')
-      if (!entries.length) return
+      const entries = timelineRef.current?.querySelectorAll('.timeline-entry')
+      if (!entries?.length) return
 
       // Need at least one span to measure digit height
       const existingSpans = binarySpansRef.current

@@ -34,4 +34,3 @@ export function TimelineEntry({ entry, delay }: TimelineEntryProps) {
     </div>
   )
 }
-

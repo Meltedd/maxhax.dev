@@ -1,4 +1,3 @@
-import { Fragment } from 'react'
 import { TimelineWrapper } from '@/components/TimelineWrapper'
 import { timelineEntries } from '@/components/timeline-data'
 import { TimelineEntry } from '@/components/TimelineEntry'
@@ -20,21 +19,12 @@ export const dynamic = 'force-static'
     const DELAY_STEP = 0.35
     const reversedEntries = [...timelineEntries].reverse()
 
-    return reversedEntries.map((entry, index) => {
-      const previousYear = index === 0 ? null : reversedEntries[index - 1]?.year
-      const showYearMarker = entry.year !== previousYear
-      const key = `${entry.year}-${entry.month}-${index}`
-
-      return (
-        <Fragment key={key}>
-          {showYearMarker && (
-            <div className="timeline-year-marker">
-              <span className="year-label">{entry.year}</span>
-            </div>
-          )}
-          <TimelineEntry entry={entry} delay={BASE_DELAY + index * DELAY_STEP} />
-        </Fragment>
-      )
-    })
+    return reversedEntries.map((entry, index) => (
+      <TimelineEntry
+        key={`${entry.year}-${entry.month}-${index}`}
+        entry={entry}
+        delay={BASE_DELAY + index * DELAY_STEP}
+      />
+    ))
   })()}
 </TimelineWrapper>

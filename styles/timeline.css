@@ -4,9 +4,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  --timeline-axis: 40%;
-  --timeline-branch-gap: 1.5rem;
-  --timeline-column-width: calc(100% - var(--timeline-axis) - var(--timeline-branch-gap));
+  --timeline-axis: 50%;
+  --timeline-gap: 3rem;
 }
 
 .timeline {
@@ -14,18 +13,6 @@
   padding: 0 0 4rem;
   isolation: isolate;
   width: 100%;
-}
-
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 2rem;
-  width: 1px;
-  background: transparent;
-  opacity: 0;
-  z-index: 0;
 }
 
 .sticky-year-indicator {
@@ -102,20 +89,19 @@
 
 .timeline-fade-top {
   position: sticky;
-  top: -4rem;
+  top: 0;
   left: 0;
   margin-top: -6rem;
   margin-left: -3rem;
   width: calc(100% + 6rem);
-  height: 14rem;
-  margin-bottom: -8rem;
-  padding-top: 4rem;
+  height: 10rem;
+  margin-bottom: -4rem;
   background: linear-gradient(to bottom,
-    var(--background) 0%, var(--background) 25%,
-    color-mix(in srgb, var(--background) 95%, transparent) 40%,
-    color-mix(in srgb, var(--background) 70%, transparent) 60%,
-    color-mix(in srgb, var(--background) 30%, transparent) 80%,
-    transparent 100%);
+    var(--background) 0%, var(--background) 15%,
+    color-mix(in srgb, var(--background) 90%, transparent) 25%,
+    color-mix(in srgb, var(--background) 60%, transparent) 35%,
+    color-mix(in srgb, var(--background) 20%, transparent) 45%,
+    transparent 55%);
   pointer-events: none;
   z-index: 9;
 }
@@ -125,7 +111,7 @@
   bottom: 0;
   left: 0;
   margin-left: -3rem;
-  width: calc(100% + 3rem);
+  width: calc(100% + 6rem);
   height: 28rem;
   margin-top: -14rem;
   background: linear-gradient(to top,
@@ -139,103 +125,75 @@
   z-index: 9;
 }
 
-.timeline-year-marker {
-  position: relative;
-  height: 0;
-  margin: 3rem 0 0;
-  padding: 0;
-  opacity: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.year-label {
-  position: absolute;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--color-rurikon-400);
-  letter-spacing: 0.12em;
-  font-family: var(--font-family-sans);
-  text-transform: uppercase;
-  visibility: hidden;
-}
-
 .timeline-entry {
   position: relative;
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: var(--timeline-gap);
+  align-items: start;
   margin-bottom: 2.5rem;
 }
 
-.timeline-entry:nth-child(odd of .timeline-entry) {
-  padding-left: calc(var(--timeline-axis) + var(--timeline-branch-gap));
-  justify-content: flex-start;
+.timeline-entry:nth-child(odd of .timeline-entry) .entry-content {
+  grid-column: 2;
+  text-align: left;
+  padding-left: 1rem;
 }
 
-.timeline-entry:nth-child(even of .timeline-entry) {
-  padding-right: calc((100% - var(--timeline-axis)) + var(--timeline-branch-gap));
-  justify-content: flex-end;
-  flex-direction: row-reverse;
+.timeline-entry:nth-child(even of .timeline-entry) .entry-content {
+  grid-column: 1;
+  text-align: right;
+  padding-right: 1rem;
 }
 
 .entry-connector {
-  position: relative;
-  width: 2.5rem;
+  position: absolute;
+  top: 2.35rem;
+  --connector-w: 1.75rem;
+  width: var(--connector-w);
   height: 1px;
   background: var(--color-rurikon-400);
   opacity: 0.35;
-  flex-shrink: 0;
-  margin-top: 2rem;
 }
 
 .timeline-entry:nth-child(odd of .timeline-entry) .entry-connector {
-  margin-right: 0.5rem;
+  left: calc(50% + 0.4rem);
   transform: rotate(45deg);
-  transform-origin: right center;
+  transform-origin: left center;
 }
 
 .timeline-entry:nth-child(odd of .timeline-entry) .entry-connector::after {
   content: '';
   position: absolute;
-  left: -1rem;
-  top: 50%;
-  transform: translateY(-50%) rotate(-45deg);
-  width: 1rem;
+  right: -0.5rem;
+  top: 0;
+  transform: rotate(-45deg);
+  width: 0.5rem;
   height: 1px;
   background: var(--color-rurikon-400);
-  transform-origin: right center;
+  transform-origin: left center;
 }
 
 .timeline-entry:nth-child(even of .timeline-entry) .entry-connector {
-  margin-right: -0.5rem;
+  left: calc(50% - 0.4rem - var(--connector-w));
   transform: rotate(-45deg);
-  transform-origin: left center;
+  transform-origin: right center;
 }
 
 .timeline-entry:nth-child(even of .timeline-entry) .entry-connector::after {
   content: '';
   position: absolute;
-  right: -1rem;
-  top: 50%;
-  transform: translateY(-50%) rotate(45deg);
-  width: 1rem;
+  left: -0.5rem;
+  top: 0;
+  transform: rotate(45deg);
+  width: 0.5rem;
   height: 1px;
   background: var(--color-rurikon-400);
-  transform-origin: left center;
+  transform-origin: right center;
 }
 
 .entry-content {
   font-family: var(--font-family-serif);
-}
-
-.timeline-entry:nth-child(odd of .timeline-entry) .entry-content {
-  max-width: var(--timeline-column-width);
-  text-align: left;
-}
-
-.timeline-entry:nth-child(even of .timeline-entry) .entry-content {
-  text-align: right;
-  margin-left: auto;
 }
 
 .entry-month {
@@ -245,7 +203,7 @@
   color: var(--color-rurikon-300);
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.35rem;
   font-family: var(--font-family-sans);
   transition: color 0.5s cubic-bezier(0.19, 1.0, 0.22, 1.0);
 }
@@ -273,21 +231,13 @@
   .timeline-wrapper { max-width: min(66ch, 90vw); }
 }
 
-@media (max-width: 900px) {
-  .timeline-wrapper {
-    --timeline-axis: 46%;
-    --timeline-branch-gap: 1.25rem;
-  }
-}
-
 @media (max-width: 768px) {
   .timeline-wrapper {
     max-width: 100%;
-    --timeline-column-width: 100%;
+    --timeline-gap: 2rem;
   }
 
   .timeline-fade-top {
-    top: 0;
     margin-left: 0;
     width: 100%;
   }
@@ -304,33 +254,7 @@
     z-index: 40;
   }
 
-  .year-odometer,
-  .odometer-digit {
-    height: 1em;
-    line-height: 1;
-  }
+  .timeline-entry { margin-bottom: 2rem; }
 
-  .timeline { padding: 0 0 4rem; }
-  .timeline::before { bottom: 2rem; }
-
-  .timeline-entry {
-    margin-bottom: 2rem;
-    padding-left: 0;
-  }
-
-  .timeline-entry:nth-child(odd of .timeline-entry) .entry-connector {
-    margin-right: 0.5rem;
-  }
-
-  .timeline-year-marker {
-    padding-left: 0;
-    margin: 3rem 0 1.5rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .timeline-wrapper {
-    --timeline-axis: 50%;
-    --timeline-branch-gap: 1rem;
-  }
+  .entry-connector { --connector-w: 1.25rem; }
 }
