@@ -39,7 +39,9 @@ export async function sendContactEmail(
   }
 
   const headersList = await headers()
-  const ip = headersList.get('x-forwarded-for')?.split(',')[0].trim()
+  const ip =
+    headersList.get('x-real-ip')?.trim() ||
+    headersList.get('x-forwarded-for')?.split(',')[0].trim()
   if (await isRateLimited(ip)) {
     return { success: false, error: 'Too many requests. Please try again later.' }
   }
