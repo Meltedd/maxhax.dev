@@ -17,7 +17,14 @@ export async function sendContactEmail(
   message: string,
   honeypot: string,
 ): Promise<SendResult> {
-  if (honeypot.trim()) return { success: true }
+  if (typeof honeypot !== 'string' || honeypot.trim()) return { success: true }
+  if (
+    typeof senderEmail !== 'string' ||
+    typeof subject !== 'string' ||
+    typeof message !== 'string'
+  ) {
+    return { success: false, error: 'Invalid input' }
+  }
 
   const trimmedEmail = senderEmail.trim().toLowerCase()
   const trimmedSubject = subject.trim().slice(0, MAX_SUBJECT_LENGTH)
