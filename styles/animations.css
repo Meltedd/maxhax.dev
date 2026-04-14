@@ -5,8 +5,8 @@
 }
 
 @keyframes textFadeIn {
-  0% { filter: blur(4px); opacity: 0; }
-  100% { filter: blur(0px); opacity: 1; }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 @keyframes dotScale {
@@ -60,8 +60,7 @@
 }
 
 .stagger-word {
-  animation: textFadeIn 1s ease-out forwards;
-  filter: blur(4px);
+  animation: textFadeIn 0.75s ease-in-out forwards;
   opacity: 0;
 }
 
@@ -74,11 +73,24 @@
 
 .skip-animations .stagger-title,
 .skip-animations .stagger-dot,
-.skip-animations .stagger-word {
+.skip-animations .stagger-word,
+.skip-animations .stagger-timeline-entry {
   animation: none !important;
   filter: none !important;
   opacity: 1 !important;
   transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stagger-title,
+  .stagger-dot,
+  .stagger-word,
+  .stagger-timeline-entry {
+    animation: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 .animate-fade-in {
