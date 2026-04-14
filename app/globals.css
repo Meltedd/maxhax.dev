@@ -119,13 +119,12 @@ main a:hover span { color: var(--color-link-hover); }
 .underline {
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease, text-decoration-thickness 0.2s ease;
 }
 
 .underline:hover { text-decoration-thickness: 2px; }
 
 .nowrap-group { white-space: nowrap; }
-.content-fade-out { background: linear-gradient(to bottom, var(--background), transparent); }
 
 .dot-leaders {
   text-align: end;

@@ -1,6 +1,5 @@
 import { promises as fs } from 'fs'
 import path from 'path'
-import cn from 'clsx'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -29,9 +28,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <div
-      className={cn(
-        'thought-article max-w-[66ch] mobile:max-w-[min(66ch,60vw)] space-y-[clamp(1rem,1.6vw,1.75rem)] text-[clamp(0.95rem,0.65vw+0.95rem,1.25rem)]',
-      )}
+      className="thought-article content-width space-y-[clamp(1rem,1.6vw,1.75rem)] text-[clamp(0.95rem,0.65vw+0.95rem,1.25rem)]"
       lang='en'
     >
       <Link 

@@ -78,7 +78,6 @@ export default function RootLayout({
           'antialiased'
         )}
       >
-        <div className='fixed sm:hidden h-[clamp(2rem,3vw,4rem)] w-full top-0 left-0 z-30 pointer-events-none content-fade-out' />
         <div className='flex flex-col mobile:flex-row'>
           <Navbar />
           <main className='relative flex-1 max-w-8xl [contain:inline-size]'>

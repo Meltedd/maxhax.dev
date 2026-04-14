@@ -20,9 +20,10 @@
   top: 0.5rem;
   display: flex;
   align-items: baseline;
-  gap: 0.05em;
+  gap: 0;
   font-size: clamp(0.85rem, 0.5vw + 0.75rem, 0.95rem);
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
   color: var(--color-rurikon-400);
   letter-spacing: 0.15em;
   font-family: var(--font-family-sans);
@@ -41,7 +42,7 @@
 .year-odometer {
   display: inline-flex;
   overflow: hidden;
-  width: 0.65em;
+  width: 1ch;
   height: 1em;
 }
 
@@ -84,7 +85,6 @@
   font-weight: 500;
   flex-shrink: 0;
   display: inline-block;
-  transition: color 0.2s ease-out;
 }
 
 .timeline-fade-top {
@@ -94,8 +94,8 @@
   margin-top: -6rem;
   margin-left: -3rem;
   width: calc(100% + 6rem);
-  height: 10rem;
-  margin-bottom: -4rem;
+  height: 14rem;
+  margin-bottom: -8rem;
   background: linear-gradient(to bottom,
     var(--background) 0%, var(--background) 15%,
     color-mix(in srgb, var(--background) 90%, transparent) 25%,
@@ -110,19 +110,20 @@
   position: sticky;
   bottom: 0;
   left: 0;
+  margin-top: -10rem;
   margin-left: -3rem;
   width: calc(100% + 6rem);
-  height: 28rem;
-  margin-top: -14rem;
+  height: 14rem;
+  margin-bottom: -4rem;
   background: linear-gradient(to top,
-    var(--background) 0%,
-    color-mix(in srgb, var(--background) 95%, transparent) 8%,
-    color-mix(in srgb, var(--background) 75%, transparent) 25%,
-    color-mix(in srgb, var(--background) 40%, transparent) 50%,
-    color-mix(in srgb, var(--background) 10%, transparent) 75%,
-    transparent 100%);
+    var(--background) 0%, var(--background) 15%,
+    color-mix(in srgb, var(--background) 90%, transparent) 25%,
+    color-mix(in srgb, var(--background) 60%, transparent) 35%,
+    color-mix(in srgb, var(--background) 20%, transparent) 45%,
+    transparent 55%);
   pointer-events: none;
   z-index: 9;
+  transition: opacity 0.3s ease;
 }
 
 .timeline-entry {
@@ -231,9 +232,12 @@
   .timeline-wrapper { max-width: min(66ch, 90vw); }
 }
 
+@media (max-width: 479px) {
+  .timeline-wrapper { max-width: 100%; }
+}
+
 @media (max-width: 768px) {
   .timeline-wrapper {
-    max-width: 100%;
     --timeline-gap: 2rem;
   }
 
