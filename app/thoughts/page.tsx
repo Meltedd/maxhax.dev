@@ -53,14 +53,14 @@ export default async function Page() {
           <li key={item.slug}>
             <Link
               href={`/thoughts/${item.slug}`}
-              className='group flex gap-3 justify-between items-center'
+              className='group flex gap-3 justify-between items-baseline'
               draggable={false}
             >
               <span className='block text-base sm:text-lg text-rurikon-600 font-serif eb-garamond-italic transition-colors duration-300 ease-in-out'>
                 {item.title}
               </span>
               <span className='text-sm dot-leaders flex-1 text-rurikon-100 font-normal leading-none' />
-              <time className='block text-sm sm:text-base text-rurikon-300 tabular-nums font-serif tracking-tight self-start eb-garamond-italic'>
+              <time className='block text-sm sm:text-base text-rurikon-300 group-hover:text-link-hover tabular-nums font-serif tracking-tight eb-garamond-italic transition-colors duration-300 ease-in-out'>
                 {item.date}
               </time>
             </Link>

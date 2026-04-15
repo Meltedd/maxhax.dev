@@ -4,8 +4,6 @@ article {
     line-height: 0;
   }
 
-  .about-intro-balance { text-wrap: balance; }
-
   .sidenote-content {
     img, video, pre { margin: 0; }
   }
@@ -52,9 +50,9 @@ article .thought-article blockquote {
 }
 
 article .thought-article h2 {
-  font-size: clamp(1.35rem, 1.9vw, 2.1rem);
+  font-size: 1.35rem;
 }
 
 article .thought-article h3 {
-  font-size: clamp(1.15rem, 1.4vw, 1.35rem);
+  font-size: 1.15rem;
 }

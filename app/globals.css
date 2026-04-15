@@ -5,7 +5,6 @@
 @import '../styles/animations.css';
 @import '../styles/code.css';
 @import '../styles/article.css';
-@import '../styles/whoami.css';
 @import '../styles/timeline.css';
 
 @layer utilities {
@@ -21,10 +20,7 @@
 }
 
 @utility content-width {
-  max-width: 66ch;
-  @media (min-width: 480px) {
-    max-width: min(66ch, 60vw);
-  }
+  max-width: 60ch;
 }
 
 @theme {
@@ -56,9 +52,8 @@
   --font-family-zh: var(--sans), -apple-system, ui-sans-serif, system-ui,
     'PingFang SC', 'Hiragino Sans GB', 'Source Han Sans CN', sans-serif;
 
-  --breakpoint-text: 1220px;
-  --breakpoint-mobile: 480px;
-  --container-8xl: 90rem;
+  --breakpoint-text: 76.25rem;
+  --breakpoint-mobile: 30rem;
 }
 
 :root {
@@ -68,7 +63,11 @@
 }
 
 html {
-  font-size: clamp(13.5px, 0.9vw + 10px, 19px);
+  font-size: clamp(13.5px, 0.9vw + 10px, 17px);
+
+  @media (min-width: 40rem) {
+    font-size: 17px;
+  }
 }
 
 body {
@@ -81,11 +80,10 @@ body {
   font-optical-sizing: auto;
   text-decoration-skip-ink: auto;
   text-spacing-trim: space-first;
-  text-rendering: geometricPrecision;
   text-autospace: normal;
   letter-spacing: 0.005em;
   word-spacing: -0.02em;
-  line-height: clamp(1.45em, calc(1.45em + 0.22vw), 1.65em);
+  line-height: 1.55em;
   background-color: var(--background);
 }
 
@@ -98,7 +96,6 @@ main {
   hanging-punctuation: first allow-end last;
   hyphens: auto;
   hyphenate-limit-chars: 10 5 5;
-  text-wrap: pretty;
 }
 
 del { text-decoration-thickness: 1px; }
@@ -135,5 +132,5 @@ main a:hover span { color: var(--color-link-hover); }
 }
 
 .dot-leaders::after {
-  content: '······································································';
+  content: '........................................................................';
 }

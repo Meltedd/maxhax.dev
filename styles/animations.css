@@ -36,10 +36,7 @@
 }
 
 .stagger-title {
-  animation: textBlurIn 0.4s ease-out forwards;
-  filter: blur(4px);
-  opacity: 0;
-  transform: scale(0.98);
+  animation: textBlurIn 0.4s ease-out backwards;
 }
 
 .stagger-title:nth-child(1) { animation-delay: 0.1s; }
@@ -48,21 +45,16 @@
 .stagger-title:nth-child(4) { animation-delay: 0.7s; }
 
 .stagger-dot {
-  animation: dotScale 0.5s ease-out forwards;
-  animation-delay: 2.4s;
-  opacity: 0;
-  transform: scale(0.5);
+  animation: dotScale 0.5s ease-out backwards;
+  animation-delay: 3.2s;
 }
 
 .stagger-word {
-  animation: textFadeIn 0.5s ease-in-out forwards;
-  opacity: 0;
+  animation: textFadeIn 0.5s ease-in-out backwards;
 }
 
 .stagger-timeline-entry {
-  animation: timelineBlurIn 0.5s ease-out forwards;
-  filter: blur(8px);
-  opacity: 0;
+  animation: timelineBlurIn 0.5s ease-out backwards;
   will-change: filter, opacity;
 }
 

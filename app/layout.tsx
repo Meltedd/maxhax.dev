@@ -72,16 +72,16 @@ export default function RootLayout({
           sans.variable,
           ebGaramond.variable,
           mono.variable,
-          'w-full py-[clamp(1.5rem,2.5vw,4rem)] px-[clamp(1.5rem,3vw,3.5rem)] mobile:pl-0 mobile:pr-[clamp(0.75rem,1.25vw,2rem)]',
-          'text-[clamp(1rem,0.5vw+0.95rem,1.3rem)]',
+          'w-full py-6 px-[clamp(1.5rem,3vw,3.5rem)] mobile:pl-0 mobile:pr-3',
+          'text-[clamp(1rem,0.5vw+0.95rem,1.15rem)]',
           'text-rurikon-500',
           'antialiased'
         )}
       >
-        <div className='flex flex-col mobile:flex-row'>
+        <div className='flex flex-col mobile:flex-row max-w-3xl'>
           <Navbar />
-          <main className='relative flex-1 max-w-8xl [contain:inline-size]'>
-            <div className='hidden mobile:block absolute left-0 w-px h-full opacity-100 bg-rurikon-border' />
+          <main className='relative flex-1 [contain:inline-size]'>
+            <div className='hidden mobile:block absolute left-0 w-px h-full bg-rurikon-border' />
             <ErrorBoundary>
               <NavigationWrapper>
                 {children}
