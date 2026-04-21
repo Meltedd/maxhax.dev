@@ -1,6 +1,5 @@
 code {
-  font-family: var(--mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
-    Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-family: var(--font-family-mono);
   font-size: clamp(0.8rem, 0.28vw + 0.75rem, 0.95rem);
   word-spacing: -0.15em;
   background: transparent;

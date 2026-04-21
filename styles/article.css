@@ -1,4 +1,4 @@
-article {
+.thought-article {
   figure {
     margin-top: 2.25rem;
     line-height: 0;
@@ -35,24 +35,10 @@ article {
 
   details summary::marker { content: ''; }
   details p:first-of-type { margin-top: 0; }
-}
 
-article .thought-article .article-p,
-article .thought-article li {
-  font-size: 0.8em;
-}
+  p, li { font-size: 0.8em; }
+  em, i, .font-serif, blockquote { font-size: 1.05em; }
 
-article .thought-article em,
-article .thought-article i,
-article .thought-article .font-serif,
-article .thought-article blockquote {
-  font-size: 1.05em;
-}
-
-article .thought-article h2 {
-  font-size: 1.35rem;
-}
-
-article .thought-article h3 {
-  font-size: 1.15rem;
+  h2 { font-size: 1.35rem; }
+  h3 { font-size: 1.15rem; }
 }

@@ -27,18 +27,18 @@ export default async function Page({ params }: PageProps) {
   }
 
   return (
-    <div
+    <article
       className="thought-article content-width space-y-4 text-[clamp(0.95rem,0.65vw+0.95rem,1.25rem)]"
       lang='en'
     >
-      <Link 
-        href="/thoughts" 
+      <Link
+        href="/thoughts"
         className="inline-block mb-6 text-rurikon-400 hover:text-rurikon-700 transition-colors text-base sm:text-lg eb-garamond-italic"
       >
         ← thoughts
       </Link>
       <MDXContent />
-    </div>
+    </article>
   )
 }
 

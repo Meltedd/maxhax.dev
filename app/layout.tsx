@@ -78,7 +78,7 @@ export default function RootLayout({
           'antialiased'
         )}
       >
-        <div className='flex flex-col mobile:flex-row max-w-3xl'>
+        <div className='flex flex-col mobile:flex-row max-w-4xl'>
           <Navbar />
           <main className='relative flex-1 [contain:inline-size]'>
             <div className='hidden mobile:block absolute left-0 w-px h-full bg-rurikon-border' />

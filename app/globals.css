@@ -20,7 +20,7 @@
 }
 
 @utility content-width {
-  max-width: 60ch;
+  max-width: 72ch;
 }
 
 @theme {
@@ -49,10 +49,7 @@
   --font-family-serif: var(--serif), ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   --font-family-mono: var(--mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
     Consolas, 'Liberation Mono', 'Courier New', monospace;
-  --font-family-zh: var(--sans), -apple-system, ui-sans-serif, system-ui,
-    'PingFang SC', 'Hiragino Sans GB', 'Source Han Sans CN', sans-serif;
 
-  --breakpoint-text: 76.25rem;
   --breakpoint-mobile: 30rem;
 }
 
@@ -83,7 +80,7 @@ body {
   text-autospace: normal;
   letter-spacing: 0.005em;
   word-spacing: -0.02em;
-  line-height: 1.55em;
+  line-height: 1.6em;
   background-color: var(--background);
 }
 
@@ -96,6 +93,10 @@ main {
   hanging-punctuation: first allow-end last;
   hyphens: auto;
   hyphenate-limit-chars: 10 5 5;
+}
+
+main p {
+  text-wrap: pretty;
 }
 
 del { text-decoration-thickness: 1px; }
@@ -120,8 +121,6 @@ main a:hover span { color: var(--color-link-hover); }
 }
 
 .underline:hover { text-decoration-thickness: 2px; }
-
-.nowrap-group { white-space: nowrap; }
 
 .dot-leaders {
   text-align: end;

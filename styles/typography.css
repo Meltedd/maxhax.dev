@@ -42,20 +42,11 @@ i, em, blockquote, nav, .sidenote, .font-serif {
   letter-spacing: -0.008em;
 }
 
-.font-serif.font-medium {
-  font-variation-settings: 'wght' 500;
-}
-
 .eb-garamond-italic {
-  font-family: 'EB Garamond', var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif !important;
-  font-style: italic !important;
+  font-family: 'EB Garamond', var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif;
+  font-style: italic;
 }
 
 h1.eb-garamond-italic {
-  font-weight: 800 !important;
-}
-
-.text-rurikon-300.italic {
-  font-style: italic !important;
-  font-family: var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif !important;
+  font-weight: 800;
 }
