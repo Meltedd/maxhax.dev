@@ -49,6 +49,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  transform: translateY(calc(var(--year-progress, 0) * -1em));
 }
 
 .odometer-digit {
@@ -63,7 +64,7 @@
 .binary-line {
   position: absolute;
   left: var(--timeline-axis);
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(var(--parallax-y, 0px));
   top: 0;
   display: flex;
   flex-direction: column;
