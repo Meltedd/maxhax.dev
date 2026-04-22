@@ -34,10 +34,10 @@
     "@tailwindcss/postcss": "^4.2.4",
     "@types/node": "^24.12.2",
     "@types/react": "^19.2.14",
-    "depcheck": "^1.4.7",
     "eslint": "^9.39.4",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.5.0",
+    "knip": "^6.6.1",
     "postcss": "^8.5.10",
     "tailwindcss": "^4.2.4",
     "typescript": "^5.9.3",
@@ -47,9 +47,6 @@
   "pnpm": {
     "minimumReleaseAge": 4320,
     "overrides": {
-      "depcheck>lodash": ">=4.18.0",
-      "depcheck>minimatch": ">=7.4.8",
-      "multimatch>minimatch": ">=3.1.3",
       "micromatch>picomatch": ">=2.3.2",
       "tinyglobby>picomatch": ">=4.0.4"
     }
