@@ -141,7 +141,7 @@ export const timelineEntries: TimelineEntry[] = [
     year: '2026',
     month: 'Jan 2026',
     body: [
-      { type: 'text', text: 'Discovered a high-severity vulnerability in Netflix production systems ($5,100 bounty).' },
+      { type: 'text', text: 'Discovered a high-severity vulnerability in Netflix production systems ($5,100 bounty + retesting).' },
     ],
   },
   {
@@ -179,7 +179,16 @@ export const timelineEntries: TimelineEntry[] = [
     year: '2026',
     month: 'Apr 2026',
     body: [
-      { type: 'text', text: 'Discovered another high-severity vulnerability for Netflix ($5,000 bounty).' },
+      { type: 'text', text: 'Discovered another high-severity vulnerability for Netflix, privately ($5,000 bounty).' },
+    ],
+  },
+  {
+    year: '2026',
+    month: 'May 2026',
+    body: [
+      { type: 'text', text: 'Disclosed a ReDoS vulnerability in Svelte\'s <svelte:element> tag validation (' },
+      { type: 'link', text: 'CVE-2026-42567', href: 'https://github.com/sveltejs/svelte/security/advisories/GHSA-9rmh-mm8f-r9h6' },
+      { type: 'text', text: ', ~$1,000 bounty).' },
     ],
   },
 ]
