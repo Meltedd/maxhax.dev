@@ -12,43 +12,44 @@
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
-    "@next/mdx": "15.5.15",
+    "@next/mdx": "15.5.18",
     "@types/mdx": "^2.0.13",
     "@upstash/ratelimit": "^2.0.8",
-    "@upstash/redis": "^1.37.0",
+    "@upstash/redis": "^1.38.0",
     "@vercel/analytics": "^1.6.1",
     "clsx": "^2.1.1",
-    "katex": "^0.16.45",
-    "next": "15.5.15",
+    "katex": "^0.16.46",
+    "next": "15.5.18",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-h5-audio-player": "^3.10.2",
     "react-katex": "^3.1.0",
-    "resend": "^6.12.2",
+    "resend": "^6.12.3",
     "sharp": "^0.34.5",
     "shiki": "^3.23.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
-    "@next/eslint-plugin-next": "^16.2.4",
-    "@tailwindcss/postcss": "^4.2.4",
+    "@next/eslint-plugin-next": "^16.2.6",
+    "@tailwindcss/postcss": "^4.3.0",
     "@types/node": "^24.12.2",
     "@types/react": "^19.2.14",
     "eslint": "^9.39.4",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.5.0",
-    "knip": "^6.6.1",
-    "postcss": "^8.5.10",
-    "tailwindcss": "^4.2.4",
+    "knip": "^6.14.0",
+    "postcss": "^8.5.14",
+    "tailwindcss": "^4.3.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.59.0"
+    "typescript-eslint": "^8.59.3"
   },
   "packageManager": "pnpm@10.24.0",
   "pnpm": {
-    "minimumReleaseAge": 4320,
     "overrides": {
       "micromatch>picomatch": ">=2.3.2",
-      "tinyglobby>picomatch": ">=4.0.4"
+      "tinyglobby>picomatch": ">=4.0.4",
+      "next>postcss": ">=8.5.10",
+      "brace-expansion@5": ">=5.0.6"
     }
   }
 }
