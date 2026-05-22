@@ -191,5 +191,20 @@ export const timelineEntries: TimelineEntry[] = [
       { type: 'text', text: ', ~$1,000 bounty).' },
     ],
   },
+  {
+    year: '2026',
+    month: 'May 2026',
+    body: [
+      { type: 'text', text: 'Earned another $5,000 bounty from Netflix for a privately disclosed high-severity report.' },
+    ],
+  },
+  {
+    year: '2026',
+    month: 'May 2026',
+    body: [
+      { type: 'text', text: 'Ranked as ' },
+      { type: 'link', text: 'Netflix\'s #1 hacker', href: 'https://hackerone.com/netflix/thanks/2026' },
+      { type: 'text', text: ' of 2026 (#3 all-time) on HackerOne\'s leaderboard!' },
+    ],
+  },
 ]
-
