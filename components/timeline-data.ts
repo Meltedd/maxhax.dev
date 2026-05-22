@@ -8,6 +8,7 @@ export interface TimelineEntry {
   body: TimelineBodyPart[]
 }
 
+// Entries are ordered oldest first, meaning new entries go at the end.
 export const timelineEntries: TimelineEntry[] = [
   {
     year: '2019',
@@ -184,7 +185,7 @@ export const timelineEntries: TimelineEntry[] = [
   },
   {
     year: '2026',
-    month: 'May 2026',
+    month: 'Apr 2026',
     body: [
       { type: 'text', text: 'Disclosed a ReDoS vulnerability in Svelte\'s <svelte:element> tag validation (' },
       { type: 'link', text: 'CVE-2026-42567', href: 'https://github.com/sveltejs/svelte/security/advisories/GHSA-9rmh-mm8f-r9h6' },
