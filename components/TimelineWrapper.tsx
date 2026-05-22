@@ -21,10 +21,6 @@ const SCROLL_SNAP = 50
 // Parallax
 const PARALLAX_FACTOR = 0.4
 
-// Column sizing
-const COLUMN_BUFFER_MOBILE = 0.31
-const COLUMN_BUFFER_DESKTOP = 0.38
-
 // Scramble momentum
 const VELOCITY_SCALE = 18
 const MAX_MOMENTUM = 1.4
@@ -61,13 +57,12 @@ const buildBinary = (scrollPos: number, numDigits: number): string => {
 export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps) {
   const timelineRef = useRef<HTMLDivElement>(null)
   const stickyRef = useRef<HTMLDivElement>(null)
+  const binaryRailRef = useRef<HTMLDivElement>(null)
   const binaryLineRef = useRef<HTMLDivElement>(null)
-  const seedDigitRef = useRef<HTMLSpanElement>(null)
   const bottomFadeRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let sections: SectionRef[] = []
-    const binarySpans: HTMLSpanElement[] = [seedDigitRef.current!]
     const scrambleMap = new Map<number, { value: string; time: number }>()
     const columns = Array.from(
       stickyRef.current!.querySelectorAll<HTMLElement>('.odometer-digits')
@@ -78,11 +73,15 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
     let currentYear = initialYear
     let nextYear = initialYear
     let yearProgress = 0
-    let lastY = 0
-    let lastTime = 0
+    let lastY = window.scrollY
+    let lastTime = performance.now()
     let momentum = 0
     let lastRenderedQ = -1
+    let railDigitCount = 1
+    let reduceMotion = false
     let decayTimeoutId: ReturnType<typeof setTimeout> | null = null
+    let scrollRafId: number | null = null
+    let layoutRafId: number | null = null
 
     const setYear = (current: string, next: string, progress: number) => {
       if (currentYear === current && nextYear === next && yearProgress === progress) return
@@ -107,8 +106,8 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       const scrollY = window.scrollY
       const stickyOffset = stickyRef.current?.offsetHeight || 0
       const scrollPos = scrollY + stickyOffset
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight
-      const maxReachable = docHeight + stickyOffset
+      const maxScrollY = document.documentElement.scrollHeight - window.innerHeight
+      const maxReachable = maxScrollY + stickyOffset
 
       const firstStart = sections[0].offset
       const lastStart = sections[sections.length - 1].offset
@@ -149,10 +148,9 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       setYear(last.year, last.year, 0)
     }
 
-    const applyScramble = (scrollY: number, numDigits: number) => {
-      const now = performance.now()
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight
-      const center = (docHeight > 0 ? scrollY / docHeight : 0) * numDigits
+    const applyScramble = (scrollY: number, numDigits: number, now: number) => {
+      const maxScrollY = document.documentElement.scrollHeight - window.innerHeight
+      const center = (maxScrollY > 0 ? scrollY / maxScrollY : 0) * numDigits
       const width = SCRAMBLE_WIDTH_BASE + momentum * SCRAMBLE_WIDTH_GAIN
 
       scrambleMap.forEach((data, i) => {
@@ -168,35 +166,40 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       }
     }
 
-    const renderBinary = (scrollY: number) => {
-      const q = Math.floor(scrollY / SCROLL_SNAP) * SCROLL_SNAP
-      const active = momentum >= MIN_INTENSITY
+    const renderBinary = (scrollY: number, now: number) => {
+      const sourceY = reduceMotion ? 0 : scrollY
+      const q = reduceMotion ? 0 : Math.floor(sourceY / SCROLL_SNAP) * SCROLL_SNAP
+      const active = !reduceMotion && momentum >= MIN_INTENSITY
       if (!active && q === lastRenderedQ) return
       lastRenderedQ = active ? -1 : q
 
-      const base = buildBinary(scrollY, binarySpans.length)
-      if (active) applyScramble(scrollY, binarySpans.length)
+      const base = buildBinary(sourceY, railDigitCount)
+      if (active) applyScramble(scrollY, railDigitCount, now)
       else scrambleMap.clear()
 
-      for (let i = 0; i < binarySpans.length; i++) {
-        const ch = scrambleMap.get(i)?.value ?? base[i]
-        if (binarySpans[i].textContent !== ch) binarySpans[i].textContent = ch
+      const chars: string[] = []
+      for (let i = 0; i < railDigitCount; i++) {
+        chars.push(scrambleMap.get(i)?.value ?? base[i])
       }
+      const text = chars.join('\n')
+      const line = binaryLineRef.current!
+      if (line.textContent !== text) line.textContent = text
     }
 
     const startDecayTail = () => {
+      if (reduceMotion) return
       if (decayTimeoutId) clearTimeout(decayTimeoutId)
       let decayStep = 0
 
       const step = () => {
         momentum *= DECAY_FACTOR
-        renderBinary(lastY)
+        renderBinary(lastY, performance.now())
 
         if (++decayStep < DECAY_STEPS) {
           decayTimeoutId = setTimeout(step, DECAY_INTERVAL)
         } else {
           momentum = 0
-          renderBinary(lastY)
+          renderBinary(lastY, performance.now())
           decayTimeoutId = null
         }
       }
@@ -204,11 +207,11 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       decayTimeoutId = setTimeout(step, DECAY_DELAY)
     }
 
-    const update = (scrollY: number, now: number) => {
+    const renderFrame = (scrollY: number, now: number) => {
       const dt = Math.max(now - lastTime, 16)
       const dy = scrollY - lastY
 
-      if (dy !== 0) {
+      if (!reduceMotion && dy !== 0) {
         const speed = Math.abs(dy) / dt
         momentum = Math.max(momentum, Math.min(speed * VELOCITY_SCALE, MAX_MOMENTUM))
         startDecayTail()
@@ -218,45 +221,19 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       lastTime = now
 
       updateStickyYear()
-      binaryLineRef.current!.style.setProperty('--parallax-y', `${-scrollY * PARALLAX_FACTOR}px`)
+      const parallaxY = reduceMotion ? 0 : -scrollY * PARALLAX_FACTOR
+      binaryLineRef.current!.style.setProperty('--parallax-y', `${parallaxY}px`)
       if (Math.abs(dy) > 2) {
         bottomFadeRef.current!.style.opacity = dy > 0 ? '0' : '1'
       }
-      renderBinary(scrollY)
+      renderBinary(scrollY, now)
     }
 
-    const syncSpans = () => {
-      const container = binaryLineRef.current
-      const entries = timelineRef.current?.querySelectorAll('.timeline-entry')
-      if (!container || !entries?.length) return
-
-      const gap = parseFloat(getComputedStyle(container).gap) || 0
-      const pixelsPerDigit = binarySpans[0].offsetHeight + gap
-      if (pixelsPerDigit <= 0) return
-
-      const lastEntry = entries[entries.length - 1] as HTMLElement
-      const lastBottom = lastEntry.offsetTop + lastEntry.offsetHeight
-      const buffer = window.innerWidth < 768 ? COLUMN_BUFFER_MOBILE : COLUMN_BUFFER_DESKTOP
-      const needed = Math.ceil((lastBottom * (1 + buffer)) / pixelsPerDigit)
-
-      while (binarySpans.length < needed) {
-        const span = document.createElement('span')
-        span.className = 'binary-digit'
-        span.textContent = '0'
-        container.appendChild(span)
-        binarySpans.push(span)
-      }
-      while (binarySpans.length > Math.max(needed, 1)) {
-        binarySpans.pop()!.remove()
-      }
-    }
-
-    const buildSectionRefs = () => {
-      if (!timelineRef.current) return
+    const buildSectionRefs = (entries: HTMLElement[]) => {
       const seen = new Set<string>()
       const refs: SectionRef[] = []
       const scrollY = window.scrollY
-      timelineRef.current.querySelectorAll<HTMLElement>('.timeline-entry').forEach((el) => {
+      entries.forEach((el) => {
         const year = el.dataset.year
         if (year && !seen.has(year)) {
           seen.add(year)
@@ -266,54 +243,98 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       sections = refs
     }
 
+    const syncLayout = () => {
+      const timeline = timelineRef.current
+      const rail = binaryRailRef.current
+      const line = binaryLineRef.current
+      if (!timeline || !rail || !line) return
+
+      const entries = Array.from(timeline.querySelectorAll<HTMLElement>('.timeline-entry'))
+      buildSectionRefs(entries)
+
+      let contentBottom = 0
+      for (const entry of entries) {
+        contentBottom = Math.max(contentBottom, entry.offsetTop + entry.offsetHeight)
+      }
+      const railContentHeight = contentBottom || rail.offsetHeight
+      rail.style.setProperty('--binary-rail-content-height', `${railContentHeight}px`)
+
+      const maxScrollY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
+      const maxParallaxTravel = reduceMotion ? 0 : maxScrollY * PARALLAX_FACTOR
+      const railHeight = rail.getBoundingClientRect().height
+      const requiredTextHeight = Math.max(0, railHeight - line.offsetTop + maxParallaxTravel)
+      const computedLineHeight = parseFloat(getComputedStyle(line).lineHeight)
+      const digitPitch = Number.isFinite(computedLineHeight) && computedLineHeight > 0
+        ? computedLineHeight
+        : 20
+      const nextRailDigitCount = Math.max(1, Math.ceil(requiredTextHeight / digitPitch))
+
+      if (nextRailDigitCount !== railDigitCount) {
+        railDigitCount = nextRailDigitCount
+        scrambleMap.clear()
+      }
+      lastRenderedQ = -1
+      renderFrame(window.scrollY, performance.now())
+    }
+
+    const scheduleLayoutSync = () => {
+      if (layoutRafId !== null) cancelAnimationFrame(layoutRafId)
+      layoutRafId = requestAnimationFrame(() => {
+        layoutRafId = null
+        syncLayout()
+      })
+    }
+
     let ticking = false
-    let scrollRafId = 0
     const onScroll = () => {
       if (!ticking) {
         scrollRafId = requestAnimationFrame(() => {
-          update(window.scrollY, performance.now())
+          scrollRafId = null
+          renderFrame(window.scrollY, performance.now())
           ticking = false
         })
         ticking = true
       }
     }
 
-    let resizeRafId = 0
-    const onResize = () => {
-      cancelAnimationFrame(resizeRafId)
-      resizeRafId = requestAnimationFrame(() => {
-        buildSectionRefs()
-        syncSpans()
-        updateStickyYear()
-      })
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    reduceMotion = motionQuery.matches
+    const onMotionPreferenceChange = (event: MediaQueryListEvent) => {
+      reduceMotion = event.matches
+      momentum = 0
+      scrambleMap.clear()
+      if (decayTimeoutId) {
+        clearTimeout(decayTimeoutId)
+        decayTimeoutId = null
+      }
+      lastRenderedQ = -1
+      syncLayout()
     }
 
-    let initCancelled = false
+    const resizeObserver = new ResizeObserver(scheduleLayoutSync)
+    resizeObserver.observe(timelineRef.current!)
+
+    let disposed = false
     void document.fonts.ready.then(() => {
-      if (initCancelled) return
-      buildSectionRefs()
-      syncSpans()
-      updateStickyYear()
+      if (!disposed) scheduleLayoutSync()
     })
-    const initRafId = requestAnimationFrame(() => {
-      buildSectionRefs()
-      update(window.scrollY, performance.now())
-    })
+    scheduleLayoutSync()
 
     window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onResize)
+    window.addEventListener('resize', scheduleLayoutSync)
+    motionQuery.addEventListener('change', onMotionPreferenceChange)
 
     return () => {
-      initCancelled = true
-      cancelAnimationFrame(initRafId)
-      cancelAnimationFrame(scrollRafId)
-      cancelAnimationFrame(resizeRafId)
+      disposed = true
+      resizeObserver.disconnect()
+      if (scrollRafId !== null) cancelAnimationFrame(scrollRafId)
+      if (layoutRafId !== null) cancelAnimationFrame(layoutRafId)
       window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onResize)
+      window.removeEventListener('resize', scheduleLayoutSync)
+      motionQuery.removeEventListener('change', onMotionPreferenceChange)
       if (decayTimeoutId) clearTimeout(decayTimeoutId)
-      binarySpans.slice(1).forEach((s) => s.remove())
     }
-  }, [])
+  }, [initialYear])
 
   return (
     <div className="timeline-wrapper">
@@ -329,8 +350,8 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       </div>
 
       <div className="timeline" ref={timelineRef}>
-        <div className="binary-line" ref={binaryLineRef}>
-          <span className="binary-digit" ref={seedDigitRef}>0</span>
+        <div className="binary-rail" ref={binaryRailRef} aria-hidden="true">
+          <div className="binary-line" ref={binaryLineRef} />
         </div>
 
         <div className="timeline-fade-top" />
