@@ -12,6 +12,12 @@
   --binary-edge-fade: 2.75rem;
   --binary-line-pitch: 1.27rem;
   --binary-line-start-trim: 0.375rem;
+  --timeline-year-size: clamp(0.92rem, 0.38vw + 0.84rem, 1.02rem);
+  --timeline-month-size: clamp(0.71rem, 0.55vw + 0.55rem, 0.83rem);
+  --timeline-month-gap: 0.37rem;
+  --timeline-entry-size: clamp(0.82rem, 0.66vw + 0.66rem, 1.03rem);
+  --timeline-entry-copy-gap: 0.8rem;
+  --timeline-connector-top: 2.5rem;
 }
 
 .timeline {
@@ -25,12 +31,13 @@
   position: sticky;
   top: 0.5rem;
   line-height: 1;
-  font-size: clamp(0.9rem, 0.5vw + 0.8rem, 1rem);
+  font-size: var(--timeline-year-size);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: var(--color-rurikon-400);
   letter-spacing: 0.15em;
-  font-family: var(--font-family-sans);
+  font-family: var(--sans), -apple-system, ui-sans-serif, system-ui,
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   text-transform: uppercase;
   margin-bottom: 1rem;
   padding: 0.25rem 0.5rem;
@@ -165,7 +172,7 @@
 
 .entry-connector {
   position: absolute;
-  top: 2.35rem;
+  top: var(--timeline-connector-top);
   width: var(--branch-length);
   height: 1px;
   background: var(--color-rurikon-400);
@@ -208,19 +215,16 @@
   transform-origin: right center;
 }
 
-.entry-content {
-  font-family: var(--font-family-serif);
-}
-
 .entry-month {
   display: block;
-  font-size: clamp(0.65rem, 0.5vw + 0.5rem, 0.75rem);
+  font-size: var(--timeline-month-size);
   font-weight: 600;
   color: var(--color-rurikon-300);
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  margin-bottom: 0.35rem;
-  font-family: var(--font-family-sans);
+  margin-bottom: var(--timeline-month-gap);
+  font-family: var(--sans), -apple-system, ui-sans-serif, system-ui,
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   transition: color 0.5s cubic-bezier(0.19, 1.0, 0.22, 1.0);
 }
 
@@ -230,10 +234,10 @@
 
 .entry-content p {
   font-family: 'EB Garamond', var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif;
-  font-size: clamp(0.75rem, 0.6vw + 0.6rem, 0.95rem);
+  font-size: var(--timeline-entry-size);
   color: var(--color-rurikon-600);
   line-height: 1.7;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 var(--timeline-entry-copy-gap) 0;
   transition: color 0.5s cubic-bezier(0.19, 1.0, 0.22, 1.0);
 }
 
@@ -261,7 +265,6 @@
 
   .sticky-year-indicator {
     top: 0.25rem;
-    font-size: 0.9rem;
     padding: 0.2rem 0.4rem;
     z-index: 40;
   }

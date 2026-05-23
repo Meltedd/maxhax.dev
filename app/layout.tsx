@@ -73,7 +73,7 @@ export default function RootLayout({
           ebGaramond.variable,
           mono.variable,
           'w-full py-6 px-[clamp(1.5rem,3vw,3.5rem)] mobile:pl-0 mobile:pr-3',
-          'text-[clamp(1rem,0.5vw+0.95rem,1.15rem)]',
+          'text-site-base',
           'text-rurikon-500',
           'antialiased'
         )}

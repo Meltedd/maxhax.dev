@@ -38,14 +38,14 @@ export function Navbar() {
   return (
     <nav
       className={cn(
-        'w-full px-[clamp(1.5rem,3vw,3.5rem)]',
+        'w-full',
         'mobile:w-28 mobile:px-0 mobile:mr-6'
       )}
     >
       <ul
         className={cn(
           'flex items-center justify-end gap-[clamp(1rem,1.5vw,1.25rem)]',
-          'text-[clamp(0.95rem,0.45vw+0.9rem,1.1rem)] eb-garamond-italic',
+          'text-site-nav eb-garamond-italic',
           'pb-4 border-b border-rurikon-border/50 mobile:border-b-0',
           'mobile:block mobile:sticky mobile:top-8',
           'mobile:pb-4 mobile:text-right mobile:space-y-3'

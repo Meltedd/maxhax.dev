@@ -4,12 +4,12 @@ export const metadata = { title: 'Max Harari' }
 export const dynamic = 'force-static'
 
 <div className="mb-8 mobile:mb-10">
-  <h1 className="text-[3.5rem] font-bold text-rurikon-700 mb-3 mobile:mb-4 tracking-tight eb-garamond-italic">
+  <h1 className="text-display-title font-bold text-rurikon-700 mb-3 mobile:mb-4 tracking-tight eb-garamond-italic">
     <StaggerTitle text="Hey, I'm Max Harari" />
   </h1>
 
   <div className="max-w-[42ch] mb-5 mobile:mb-6">
-    <div className="text-[clamp(1.2rem,calc(0.9vw+1.1rem),1.5rem)] text-rurikon-700 font-serif font-light italic relative">
+    <div className="text-home-lede text-rurikon-700 font-serif font-light italic relative">
       <Stagger start={1.0} items={[
         "I'm a",
         { text: "Security Researcher", className: "font-semibold" },
@@ -22,7 +22,7 @@ export const dynamic = 'force-static'
     </div>
   </div>
   
-  <div className="content-width space-y-3 mobile:space-y-4 text-[clamp(0.85rem,0.5vw+0.8rem,1.05rem)] text-rurikon-600 font-serif">
+  <div className="content-width space-y-4 mobile:space-y-5 text-page-copy text-rurikon-600 font-serif">
     <StaggeredCopy start={1.13} paragraphs={[
       [
         "My security research is primarily done through",

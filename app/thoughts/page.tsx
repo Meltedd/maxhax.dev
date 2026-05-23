@@ -45,10 +45,10 @@ export default async function Page() {
 
   return (
     <div className="content-width">
-      <h1 className="text-4xl sm:text-5xl font-bold text-rurikon-700 mb-6 tracking-tight eb-garamond-italic">
+      <h1 className="text-page-title font-bold text-rurikon-700 page-title-gap tracking-tight eb-garamond-italic">
         Thoughts
       </h1>
-      <ul className="space-y-5">
+      <ul className="space-y-2">
         {items.map((item) => (
           <li key={item.slug}>
             <Link
@@ -56,11 +56,11 @@ export default async function Page() {
               className='group flex gap-3 justify-between items-baseline'
               draggable={false}
             >
-              <span className='block text-base sm:text-lg text-rurikon-600 font-serif eb-garamond-italic transition-colors duration-300 ease-in-out'>
+              <span className='block text-section-lede text-rurikon-600 font-serif eb-garamond-italic transition-colors duration-300 ease-in-out'>
                 {item.title}
               </span>
               <span className='text-sm dot-leaders flex-1 text-rurikon-100 font-normal leading-none' />
-              <time className='block text-sm sm:text-base text-rurikon-300 group-hover:text-link-hover tabular-nums font-serif tracking-tight eb-garamond-italic transition-colors duration-300 ease-in-out'>
+              <time className='block text-list-meta text-rurikon-300 group-hover:text-link-hover tabular-nums font-serif tracking-tight eb-garamond-italic transition-colors duration-300 ease-in-out'>
                 {item.date}
               </time>
             </Link>

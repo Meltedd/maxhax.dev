@@ -21,7 +21,7 @@ h3 {
   letter-spacing: -0.005em;
 }
 
-i, em, blockquote, nav, .sidenote, .font-serif {
+i, em, blockquote, nav, .sidenote {
   font-family: var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif;
   font-optical-sizing: auto;
   font-weight: 400;
@@ -38,6 +38,7 @@ i, em, blockquote, nav, .sidenote, .font-serif {
 }
 
 .font-serif.font-light {
+  font-weight: 300;
   font-variation-settings: 'wght' 300;
   letter-spacing: -0.008em;
 }

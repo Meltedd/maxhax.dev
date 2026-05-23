@@ -80,10 +80,10 @@ export function ContactForm() {
   return (
     <>
       <div className="mb-[clamp(1.5rem,3vw,2.5rem)]">
-        <h1 className="text-4xl sm:text-5xl font-bold text-rurikon-700 mb-[clamp(0.75rem,2vw,1.25rem)] tracking-tight eb-garamond-italic">
+        <h1 className="text-page-title font-bold text-rurikon-700 page-title-gap tracking-tight eb-garamond-italic">
           Get in touch
         </h1>
-        <p className="text-lg text-rurikon-400 eb-garamond-italic">
+        <p className="text-section-lede text-rurikon-400 eb-garamond-italic">
           If you want to connect, I&apos;m easy to reach :)
         </p>
       </div>
