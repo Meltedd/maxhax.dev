@@ -63,6 +63,7 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
 
   useEffect(() => {
     let sections: SectionRef[] = []
+    const binarySpans: HTMLSpanElement[] = []
     const scrambleMap = new Map<number, { value: string; time: number }>()
     const columns = Array.from(
       stickyRef.current!.querySelectorAll<HTMLElement>('.odometer-digits')
@@ -77,7 +78,11 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
     let lastTime = performance.now()
     let momentum = 0
     let lastRenderedQ = -1
+    let baseBinary = ''
     let railDigitCount = 1
+    let stickyOffset = 0
+    let maxScrollY = 0
+    let maxReachableScroll = 0
     let reduceMotion = false
     let decayTimeoutId: ReturnType<typeof setTimeout> | null = null
     let scrollRafId: number | null = null
@@ -100,21 +105,27 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       yearProgress = progress
     }
 
-    const updateStickyYear = () => {
+    const resetBinaryRender = () => {
+      baseBinary = ''
+      lastRenderedQ = -1
+    }
+
+    const setDigit = (index: number, value: string) => {
+      const span = binarySpans[index]
+      if (span && span.textContent !== value) span.textContent = value
+    }
+
+    const updateStickyYear = (scrollY: number) => {
       if (!sections.length) return
 
-      const scrollY = window.scrollY
-      const stickyOffset = stickyRef.current?.offsetHeight || 0
       const scrollPos = scrollY + stickyOffset
-      const maxScrollY = document.documentElement.scrollHeight - window.innerHeight
-      const maxReachable = maxScrollY + stickyOffset
 
       const firstStart = sections[0].offset
       const lastStart = sections[sections.length - 1].offset
 
       let pos = scrollPos
-      if (lastStart > maxReachable && maxReachable > firstStart) {
-        const frac = clamp((scrollPos - firstStart) / (maxReachable - firstStart), 0, 1)
+      if (lastStart > maxReachableScroll && maxReachableScroll > firstStart) {
+        const frac = clamp((scrollPos - firstStart) / (maxReachableScroll - firstStart), 0, 1)
         pos = firstStart + frac * (lastStart - firstStart)
       }
 
@@ -148,20 +159,29 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       setYear(last.year, last.year, 0)
     }
 
-    const applyScramble = (scrollY: number, numDigits: number, now: number) => {
-      const maxScrollY = document.documentElement.scrollHeight - window.innerHeight
-      const center = (maxScrollY > 0 ? scrollY / maxScrollY : 0) * numDigits
-      const width = SCRAMBLE_WIDTH_BASE + momentum * SCRAMBLE_WIDTH_GAIN
+    const expireScramble = (now: number) => {
+      for (const [i, data] of scrambleMap) {
+        if (now - data.time >= SCRAMBLE_DURATION) {
+          scrambleMap.delete(i)
+          setDigit(i, baseBinary[i])
+        }
+      }
+    }
 
-      scrambleMap.forEach((data, i) => {
-        if (now - data.time >= SCRAMBLE_DURATION) scrambleMap.delete(i)
-      })
-      for (let i = 0; i < numDigits; i++) {
+    const applyScramble = (scrollY: number, now: number) => {
+      const center = (maxScrollY > 0 ? scrollY / maxScrollY : 0) * railDigitCount
+      const width = SCRAMBLE_WIDTH_BASE + momentum * SCRAMBLE_WIDTH_GAIN
+      const start = Math.max(0, Math.floor(center - width))
+      const end = Math.min(railDigitCount - 1, Math.ceil(center + width))
+
+      for (let i = start; i <= end; i++) {
         const dist = Math.abs(i - center)
         if (dist >= width || scrambleMap.has(i)) continue
         const prob = momentum * (1 - dist / width) * SCRAMBLE_PROB_SCALE
         if (Math.random() < prob) {
-          scrambleMap.set(i, { value: Math.random() > 0.5 ? '1' : '0', time: now })
+          const value = Math.random() > 0.5 ? '1' : '0'
+          scrambleMap.set(i, { value, time: now })
+          setDigit(i, value)
         }
       }
     }
@@ -170,20 +190,26 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       const sourceY = reduceMotion ? 0 : scrollY
       const q = reduceMotion ? 0 : Math.floor(sourceY / SCROLL_SNAP) * SCROLL_SNAP
       const active = !reduceMotion && momentum >= MIN_INTENSITY
-      if (!active && q === lastRenderedQ) return
-      lastRenderedQ = active ? -1 : q
+      const baseChanged = q !== lastRenderedQ || baseBinary.length !== railDigitCount
+      if (!active && !baseChanged && scrambleMap.size === 0) return
 
-      const base = buildBinary(sourceY, railDigitCount)
-      if (active) applyScramble(scrollY, railDigitCount, now)
-      else scrambleMap.clear()
-
-      const chars: string[] = []
-      for (let i = 0; i < railDigitCount; i++) {
-        chars.push(scrambleMap.get(i)?.value ?? base[i])
+      if (baseChanged) {
+        baseBinary = buildBinary(q, railDigitCount)
+        lastRenderedQ = q
+        for (let i = 0; i < railDigitCount; i++) {
+          if (!scrambleMap.has(i)) setDigit(i, baseBinary[i])
+        }
       }
-      const text = chars.join('\n')
-      const line = binaryLineRef.current!
-      if (line.textContent !== text) line.textContent = text
+
+      if (active) {
+        expireScramble(now)
+        applyScramble(scrollY, now)
+      } else if (scrambleMap.size) {
+        for (const i of scrambleMap.keys()) {
+          setDigit(i, baseBinary[i])
+        }
+        scrambleMap.clear()
+      }
     }
 
     const startDecayTail = () => {
@@ -220,7 +246,7 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       lastY = scrollY
       lastTime = now
 
-      updateStickyYear()
+      updateStickyYear(scrollY)
       const parallaxY = reduceMotion ? 0 : -scrollY * PARALLAX_FACTOR
       binaryLineRef.current!.style.setProperty('--parallax-y', `${parallaxY}px`)
       if (Math.abs(dy) > 2) {
@@ -243,6 +269,29 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       sections = refs
     }
 
+    const syncBinaryDigits = () => {
+      const line = binaryLineRef.current
+      if (!line) return
+
+      let changed = false
+      while (binarySpans.length < railDigitCount) {
+        const span = document.createElement('span')
+        span.className = 'binary-digit'
+        span.textContent = '0'
+        line.appendChild(span)
+        binarySpans.push(span)
+        changed = true
+      }
+      while (binarySpans.length > railDigitCount) {
+        binarySpans.pop()!.remove()
+        changed = true
+      }
+      if (changed) {
+        scrambleMap.clear()
+        resetBinaryRender()
+      }
+    }
+
     const syncLayout = () => {
       const timeline = timelineRef.current
       const rail = binaryRailRef.current
@@ -259,7 +308,9 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       const railContentHeight = contentBottom || rail.offsetHeight
       rail.style.setProperty('--binary-rail-content-height', `${railContentHeight}px`)
 
-      const maxScrollY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
+      stickyOffset = stickyRef.current?.offsetHeight || 0
+      maxScrollY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
+      maxReachableScroll = maxScrollY + stickyOffset
       const maxParallaxTravel = reduceMotion ? 0 : maxScrollY * PARALLAX_FACTOR
       const railHeight = rail.getBoundingClientRect().height
       const requiredTextHeight = Math.max(0, railHeight - line.offsetTop + maxParallaxTravel)
@@ -273,7 +324,7 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
         railDigitCount = nextRailDigitCount
         scrambleMap.clear()
       }
-      lastRenderedQ = -1
+      syncBinaryDigits()
       renderFrame(window.scrollY, performance.now())
     }
 
@@ -303,11 +354,11 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       reduceMotion = event.matches
       momentum = 0
       scrambleMap.clear()
+      resetBinaryRender()
       if (decayTimeoutId) {
         clearTimeout(decayTimeoutId)
         decayTimeoutId = null
       }
-      lastRenderedQ = -1
       syncLayout()
     }
 
@@ -333,6 +384,7 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       window.removeEventListener('resize', scheduleLayoutSync)
       motionQuery.removeEventListener('change', onMotionPreferenceChange)
       if (decayTimeoutId) clearTimeout(decayTimeoutId)
+      binaryLineRef.current?.replaceChildren()
     }
   }, [initialYear])
 
