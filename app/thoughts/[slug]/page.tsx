@@ -33,7 +33,7 @@ export default async function Page({ params }: PageProps) {
     >
       <Link
         href="/thoughts"
-        className="inline-block mb-6 text-rurikon-400 hover:text-rurikon-700 transition-colors text-base sm:text-lg eb-garamond-italic"
+        className="inline-block mb-6 text-rurikon-400 hover:text-rurikon-700 text-base sm:text-lg eb-garamond-italic"
       >
         ← thoughts
       </Link>

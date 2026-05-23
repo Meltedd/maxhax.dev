@@ -79,6 +79,8 @@
 @layer base {
   :root {
     --background: #f9f4ed;
+    --link-hover-duration: 0.1s;
+    --link-hover-easing: ease;
     --sans-variation: 'opsz' 32;
     --font-features: 'cpsp' 1, 'cv01', 'cv03', 'cv04', 'calt', 'ss03', 'liga', 'ordn';
   }
@@ -123,7 +125,7 @@
   blockquote + blockquote { display: flow-root; }
 
   a {
-    transition: color 0.3s ease;
+    transition: color var(--link-hover-duration) var(--link-hover-easing);
     position: relative;
   }
 
@@ -134,16 +136,27 @@ main a:hover {
   text-decoration-color: var(--color-link-hover);
 }
 
+main a span {
+  transition: color var(--link-hover-duration) var(--link-hover-easing);
+}
+
 main a:hover span { color: var(--color-link-hover); }
 
 @layer components {
   .underline {
     text-decoration-thickness: 1px;
     text-underline-offset: 0.2em;
-    transition: color 0.2s ease, text-decoration-color 0.2s ease, text-decoration-thickness 0.2s ease;
+    transition:
+      color var(--link-hover-duration) var(--link-hover-easing),
+      text-decoration-color var(--link-hover-duration) var(--link-hover-easing),
+      text-decoration-thickness var(--link-hover-duration) var(--link-hover-easing);
   }
 
   .underline:hover { text-decoration-thickness: 2px; }
+
+  .link-hover-transition {
+    transition: color var(--link-hover-duration) var(--link-hover-easing);
+  }
 }
 
 .dot-leaders {

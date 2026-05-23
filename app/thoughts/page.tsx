@@ -56,11 +56,11 @@ export default async function Page() {
               className='group flex gap-3 justify-between items-baseline'
               draggable={false}
             >
-              <span className='block text-section-lede text-rurikon-600 font-serif eb-garamond-italic transition-colors duration-300 ease-in-out'>
+              <span className='block text-section-lede text-rurikon-600 font-serif eb-garamond-italic'>
                 {item.title}
               </span>
               <span className='text-sm dot-leaders flex-1 text-rurikon-100 font-normal leading-none' />
-              <time className='block text-list-meta text-rurikon-300 group-hover:text-link-hover tabular-nums font-serif tracking-tight eb-garamond-italic transition-colors duration-300 ease-in-out'>
+              <time className='block text-list-meta text-rurikon-300 group-hover:text-link-hover tabular-nums font-serif tracking-tight eb-garamond-italic link-hover-transition'>
                 {item.date}
               </time>
             </Link>

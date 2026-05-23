@@ -113,7 +113,7 @@ export function ContactForm() {
                     rel="noopener noreferrer"
                     aria-label={s.label}
                     draggable={false}
-                    className="inline-flex items-center gap-[clamp(0.25rem,1vw,0.5rem)] underline decoration-1 underline-offset-[0.25em] eb-garamond-italic hover:text-rurikon-700 transition-colors"
+                    className="inline-flex items-center gap-[clamp(0.25rem,1vw,0.5rem)] underline decoration-1 underline-offset-[0.25em] eb-garamond-italic hover:text-rurikon-700"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-[0.9em] w-[0.9em]">
                       <path
