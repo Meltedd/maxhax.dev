@@ -4,12 +4,46 @@
     line-height: 0;
   }
 
+  .sidenote-content-wrap {
+    display: inline-block;
+    width: 100%;
+    vertical-align: top;
+  }
+
   .sidenote-content {
+    float: left;
+    width: 100%;
+
     img, video, pre { margin: 0; }
   }
 
+  .sidenote {
+    display: block;
+    position: relative;
+    width: 85%;
+    margin: 1rem auto 0;
+    color: var(--color-rurikon-600);
+    font-size: 0.95em;
+    font-style: italic;
+    text-align: left;
+    text-wrap: pretty;
+  }
+
+  @media (min-width: 76.25rem) {
+    .sidenote {
+      display: inline;
+      float: right;
+      clear: right;
+      width: 50%;
+      margin-top: 0;
+      margin-right: -50%;
+      margin-bottom: 0;
+      padding-left: 1.5rem;
+    }
+  }
+
   .framed > img,
-  .framed > figure > span:first-child {
+  .framed > figure > .sidenote-content-wrap {
     padding: var(--frame-padding, 1.125rem);
     background: var(--frame-background, #fff);
     border: 1px solid var(--color-rurikon-border);
@@ -37,11 +71,11 @@
   details p:first-of-type { margin-top: 0; }
 
   pre {
+    font-size: 0.82em;
     margin-block: 1.5rem 1.75rem;
   }
 
-  p, li { font-size: 0.8em; }
-  blockquote p { font-size: 0.86em; }
+  blockquote p { font-size: 1em; }
   em, i, .font-serif, blockquote { font-size: 1.05em; }
 
   h2 {

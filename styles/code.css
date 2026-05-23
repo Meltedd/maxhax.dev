@@ -15,25 +15,25 @@ pre {
   background-color: var(--color-code-bg);
   border: 1px solid var(--color-code-border);
   border-radius: 6px;
-  container-type: inline-size;
   overflow-x: auto;
-  padding: clamp(0.75rem, 1.8vw, 1.8rem);
+  padding: clamp(1.125rem, 1.8vw, 2rem);
   margin: 2.25rem 0;
   max-width: 100%;
   box-sizing: border-box;
 }
 
 pre code {
-  display: block;
+  display: inline-block;
   padding: 0;
   line-height: 1.5;
-  font-size: clamp(0.85rem, 1.5cqw, 1.05rem);
+  font-size: 1em;
+  min-width: 100%;
+  width: max-content;
   white-space: pre;
 }
 
 @media (max-width: 640px) {
   pre code {
-    font-size: clamp(0.8rem, 1.8cqw, 1rem);
     line-height: 1.4;
   }
 }

@@ -28,7 +28,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <article
-      className="thought-article content-width text-[clamp(0.95rem,0.65vw+0.95rem,1.25rem)]"
+      className="thought-article text-article-copy"
       lang='en'
     >
       <Link

@@ -44,7 +44,7 @@ export default async function Page() {
   items.sort((a, b) => b.sort - a.sort)
 
   return (
-    <div className="content-width">
+    <div>
       <h1 className="text-page-title font-bold text-rurikon-700 page-title-gap tracking-tight eb-garamond-italic">
         Thoughts
       </h1>

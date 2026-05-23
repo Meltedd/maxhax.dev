@@ -27,7 +27,9 @@ export function NavigationWrapper({ children }: NavigationWrapperProps) {
         skipAnims && 'skip-animations'
       )}
     >
-      {children}
+      <div className='w-full max-w-xl'>
+        {children}
+      </div>
     </div>
   )
 }

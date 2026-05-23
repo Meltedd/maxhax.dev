@@ -19,10 +19,6 @@
   .font-black { font-variation-settings: 'wght' 800, var(--sans-variation); }
 }
 
-@utility content-width {
-  max-width: 72ch;
-}
-
 @utility page-title-gap {
   margin-bottom: clamp(0.9rem, 2.25vw, 1.35rem);
 }
@@ -60,6 +56,8 @@
   --text-home-lede--line-height: 1.5;
   --text-page-copy: clamp(1rem, 0.35vw + 0.95rem, 1.1rem);
   --text-page-copy--line-height: 1.55;
+  --text-article-copy: clamp(0.96rem, 0.22vw + 0.92rem, 1.03rem);
+  --text-article-copy--line-height: 1.62;
   --text-section-lede: clamp(1.1rem, 0.35vw + 1.04rem, 1.26rem);
   --text-section-lede--line-height: 1.5;
   --text-list-meta: clamp(0.96rem, 0.28vw + 0.9rem, 1.1rem);

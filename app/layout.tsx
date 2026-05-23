@@ -78,15 +78,15 @@ export default function RootLayout({
           'antialiased'
         )}
       >
-        <div className='flex flex-col mobile:flex-row max-w-4xl'>
+        <div className='flex flex-col mobile:flex-row'>
           <Navbar />
           <main className='relative flex-1 [contain:inline-size]'>
             <div className='hidden mobile:block absolute left-0 w-px h-full bg-rurikon-border' />
-            <ErrorBoundary>
-              <NavigationWrapper>
+            <NavigationWrapper>
+              <ErrorBoundary>
                 {children}
-              </NavigationWrapper>
-            </ErrorBoundary>
+              </ErrorBoundary>
+            </NavigationWrapper>
           </main>
         </div>
         <Analytics />
