@@ -22,7 +22,7 @@ MSBuild organizes work into targets, where each target contains one or more task
 </Target>
 ```
 
-The `<Exec>` task spawns a shell command to download and run an executable. Both commands use `-windowstyle hidden` to prevent console windows from appearing.
+The `<Exec>{:xml}` task spawns a shell command to download and run an executable. Both commands use `-windowstyle hidden{:powershell}` to prevent console windows from appearing.
 
 Standard project files define targets for the usual build operations and import Microsoft's build targets for the actual compilation process:
 ```xml
@@ -36,7 +36,7 @@ The `InitialTargets` attribute forces execution when the project loads:
 <Project ToolsVersion="15.0" InitialTargets="Build" xmlns="[http://schemas.microsoft.com/developer/msbuild/2003](http://schemas.microsoft.com/developer/msbuild/2003)">
 ```
 
-Setting `InitialTargets="Build"` makes MSBuild evaluate the Build target immediately. If your Build target or any of its dependencies contain malicious commands, they execute as soon as Visual Studio opens the file.
+Setting `<Project InitialTargets="Build">{:xml}` makes MSBuild evaluate the Build target immediately. If your Build target or any of its dependencies contain malicious commands, they execute as soon as Visual Studio opens the file.
 
 ## Injection Mechanics
 
@@ -55,7 +55,7 @@ Adding a target before that closing tag enables execution:
 </Project>
 ```
 
-The target name can be anything, but BeforeBuild integrates with the existing build workflow. Combined with `InitialTargets="Build"`, execution occurs on project load without requiring an actual build.
+The target name can be anything, but BeforeBuild integrates with the existing build workflow. Combined with `<Project InitialTargets="Build">{:xml}`, execution occurs on project load without requiring an actual build.
 
 Multiple Exec tasks run in sequence:
 ```xml

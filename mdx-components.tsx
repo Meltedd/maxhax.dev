@@ -10,6 +10,48 @@ import { InlineMath, BlockMath } from 'react-katex'
 
 import { BlockSideTitle } from '@/components/BlockSideTitle'
 
+const CODE_THEME = 'gruvbox-light-soft'
+const INLINE_CODE_LANGUAGE_MARKER = /^(.*)\{:(\w[\w+-]*)\}$/
+
+async function highlightCode(code: string, lang: string): Promise<string> {
+  return codeToHtml(code, {
+    lang,
+    theme: CODE_THEME,
+    transformers: [
+      {
+        pre: (hast) => {
+          if (hast.children.length !== 1) {
+            throw new Error('<pre>: Expected a single <code> child')
+          }
+          if (hast.children[0].type !== 'element') {
+            throw new Error('<pre>: Expected a <code> child')
+          }
+          return hast.children[0]
+        },
+        postprocess(html) {
+          return html.replace(/^<code>|<\/code>$/g, '')
+        },
+      },
+    ],
+  })
+}
+
+function parseInlineCodeLanguage(code: string): { code: string; lang: string } | null {
+  if (code.includes('\n')) {
+    return null
+  }
+
+  const match = code.match(INLINE_CODE_LANGUAGE_MARKER)
+  if (!match || !match[1]) {
+    return null
+  }
+
+  return {
+    code: match[1],
+    lang: match[2],
+  }
+}
+
 export const components: Record<
   string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -83,29 +125,16 @@ export const components: Record<
     const lang = props.className?.match(/language-(\S+)/)?.[1]
 
     if (!lang) {
+      const inlineCode = parseInlineCodeLanguage(props.children)
+      if (inlineCode) {
+        const code = await highlightCode(inlineCode.code, inlineCode.lang)
+        return <code dangerouslySetInnerHTML={{ __html: code }} />
+      }
+
       return <code>{props.children}</code>
     }
 
-    const code = await codeToHtml(props.children, {
-      lang,
-      theme: 'gruvbox-light-soft',
-      transformers: [
-        {
-          pre: (hast) => {
-            if (hast.children.length !== 1) {
-              throw new Error('<pre>: Expected a single <code> child')
-            }
-            if (hast.children[0].type !== 'element') {
-              throw new Error('<pre>: Expected a <code> child')
-            }
-            return hast.children[0]
-          },
-          postprocess(html) {
-            return html.replace(/^<code>|<\/code>$/g, '')
-          },
-        },
-      ],
-    })
+    const code = await highlightCode(props.children, lang)
 
     return <code dangerouslySetInnerHTML={{ __html: code }} />
   },
