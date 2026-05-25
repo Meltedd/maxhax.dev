@@ -6,13 +6,15 @@ export const metadata = {
 
 # Who Signs the Signer?
 
-The certificate chain doesn't survive many questions - keep asking who signed what, and you end up at a root that signed itself. Most assumptions in security are, too.
+The certificate chain naturally has to end somewhere - keep asking who signed what, and you end up at a root that signed itself. Most assumptions in security do, too.
 
 ## Who?
 
-Without identity verification, a [man-in-the-middle](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) (MITM) can negotiate encryption with both parties and forward traffic between them, keeping the channel encrypted to the wrong endpoint the entire time.
+Encryption is only useful if you know who you are encrypting to. Without some form of authentication, a [man-in-the-middle](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) can sit between two sides, negotiate separate encrypted connections with each one, and forward traffic between them.
 
-[Certificates](https://en.wikipedia.org/wiki/X.509) solve this by binding a [public key](https://en.wikipedia.org/wiki/Public-key_cryptography) to a domain name, signed by a [Certificate Authority](https://en.wikipedia.org/wiki/Certificate_authority) your browser already trusts.
+[Certificates](https://en.wikipedia.org/wiki/X.509) handle that authentication by binding a [public key](https://en.wikipedia.org/wiki/Public-key_cryptography) to a domain name, and carrying a signature from a [Certificate Authority](https://en.wikipedia.org/wiki/Certificate_authority) your browser already trusts.
+
+Follow the signatures upward, and the same question eventually comes back:
 
 <BlockSideTitle title={<>
   Certificate chains delegate authority from root CAs through intermediaries to end-entity certificates.
@@ -20,16 +22,16 @@ Without identity verification, a [man-in-the-middle](https://en.wikipedia.org/wi
 <div className="framed">![Certificate Chain](certificate-chain.png)</div>
 </BlockSideTitle>
 
-Root CAs sign intermediate CAs, which sign the certificates servers actually use, and your browser trusts a set of root CAs that ship with the operating system because your OS vendor decided to include them.
+Each signature points to another certificate until the chain reaches a root, and from there the decision comes from the root store shipped by the operating system or browser vendor.
 
 ## What?
 
-In 2011, [DigiNotar](https://en.wikipedia.org/wiki/DigiNotar), a trusted root CA, was compromised. Attackers issued fraudulent certificates for Google that every browser accepted. One link in the chain failed, and the whole thing came apart.
+In 2011, [DigiNotar](https://en.wikipedia.org/wiki/DigiNotar), a Dutch CA trusted by major browsers, was compromised. A fraudulent `*.google.com` certificate was used in attempted MITM attacks against users in Iran. Chrome caught that certificate, but DigiNotar later confirmed more than 200 fraudulent certificates across more than 20 domains (oops), and browser vendors subsequently removed it from their trusted roots.
 
-After DigiNotar, [Certificate Transparency](https://certificate.transparency.dev/) introduced public append-only logs that record every certificate a CA issues. Issuance can now be monitored and audited, but that's still just another entity to trust.
+After DigiNotar, [Certificate Transparency](https://certificate.transparency.dev/) made certificate issuance easier to watch. It's important to note that public logs do not prevent a CA from issuing the wrong certificate, but they at least make it harder for that certificate to stay hidden.
 
-On corporate networks, a root CA installed on employee machines lets the network generate certificates on the fly for every HTTPS connection, decrypting and re-encrypting traffic as it passes through. Technically identical to a MITM attack, the only difference is who installed the root certificate and whether you agreed to it.
+If an organization installs its own root certificate on employee machines, an inspection proxy can issue certificates for the sites it intercepts and sit between the browser and the real server. To the browser, those certificates chain back to a trusted root, which interestingly could have nothing to do with the website you trusted.
 
 ## Why?
 
-Every system has a version of the self-signed root, some assumption at the foundation that everything else is built on. The certificate chain makes it literal, and most of [vulnerability research](https://phrack.org/issues/49/14) is finding the ones that aren't.
+Every system has a version of the self-signed root, some assumption at the foundation that everything else is built on. The certificate chain makes it literal, and most of [vulnerability research](https://www.schneier.com/blog/archives/2008/05/the_ethics_of_v.html) is finding the ones that aren't.
