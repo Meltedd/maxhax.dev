@@ -79,7 +79,7 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
     let momentum = 0
     let lastRenderedQ = -1
     let baseBinary = ''
-    let railDigitCount = 1
+    let digitCount = 1
     let stickyOffset = 0
     let maxScrollY = 0
     let maxReachableScroll = 0
@@ -169,10 +169,10 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
     }
 
     const applyScramble = (scrollY: number, now: number) => {
-      const center = (maxScrollY > 0 ? scrollY / maxScrollY : 0) * railDigitCount
+      const center = (maxScrollY > 0 ? scrollY / maxScrollY : 0) * digitCount
       const width = SCRAMBLE_WIDTH_BASE + momentum * SCRAMBLE_WIDTH_GAIN
       const start = Math.max(0, Math.floor(center - width))
-      const end = Math.min(railDigitCount - 1, Math.ceil(center + width))
+      const end = Math.min(digitCount - 1, Math.ceil(center + width))
 
       for (let i = start; i <= end; i++) {
         const dist = Math.abs(i - center)
@@ -190,13 +190,13 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       const sourceY = reduceMotion ? 0 : scrollY
       const q = reduceMotion ? 0 : Math.floor(sourceY / SCROLL_SNAP) * SCROLL_SNAP
       const active = !reduceMotion && momentum >= MIN_INTENSITY
-      const baseChanged = q !== lastRenderedQ || baseBinary.length !== railDigitCount
+      const baseChanged = q !== lastRenderedQ || baseBinary.length !== digitCount
       if (!active && !baseChanged && scrambleMap.size === 0) return
 
       if (baseChanged) {
-        baseBinary = buildBinary(q, railDigitCount)
+        baseBinary = buildBinary(q, digitCount)
         lastRenderedQ = q
-        for (let i = 0; i < railDigitCount; i++) {
+        for (let i = 0; i < digitCount; i++) {
           if (!scrambleMap.has(i)) setDigit(i, baseBinary[i])
         }
       }
@@ -274,7 +274,7 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       if (!line) return
 
       let changed = false
-      while (binarySpans.length < railDigitCount) {
+      while (binarySpans.length < digitCount) {
         const span = document.createElement('span')
         span.className = 'binary-digit'
         span.textContent = '0'
@@ -282,7 +282,7 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
         binarySpans.push(span)
         changed = true
       }
-      while (binarySpans.length > railDigitCount) {
+      while (binarySpans.length > digitCount) {
         binarySpans.pop()!.remove()
         changed = true
       }
@@ -305,23 +305,24 @@ export function TimelineWrapper({ children, initialYear }: TimelineWrapperProps)
       for (const entry of entries) {
         contentBottom = Math.max(contentBottom, entry.offsetTop + entry.offsetHeight)
       }
-      const railContentHeight = contentBottom || rail.offsetHeight
+
+      const railContentHeight = contentBottom
       rail.style.setProperty('--binary-rail-content-height', `${railContentHeight}px`)
 
       stickyOffset = stickyRef.current?.offsetHeight || 0
       maxScrollY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
       maxReachableScroll = maxScrollY + stickyOffset
       const maxParallaxTravel = reduceMotion ? 0 : maxScrollY * PARALLAX_FACTOR
-      const railHeight = rail.getBoundingClientRect().height
-      const requiredTextHeight = Math.max(0, railHeight - line.offsetTop + maxParallaxTravel)
       const computedLineHeight = parseFloat(getComputedStyle(line).lineHeight)
       const digitPitch = Number.isFinite(computedLineHeight) && computedLineHeight > 0
         ? computedLineHeight
         : 20
-      const nextRailDigitCount = Math.max(1, Math.ceil(requiredTextHeight / digitPitch))
+      const railEndBuffer = digitPitch * 2
+      const requiredTextHeight = railContentHeight + maxParallaxTravel + railEndBuffer
+      const nextDigitCount = Math.max(1, Math.ceil(requiredTextHeight / digitPitch))
 
-      if (nextRailDigitCount !== railDigitCount) {
-        railDigitCount = nextRailDigitCount
+      if (nextDigitCount !== digitCount) {
+        digitCount = nextDigitCount
         scrambleMap.clear()
       }
       syncBinaryDigits()
