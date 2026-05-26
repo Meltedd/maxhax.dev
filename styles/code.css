@@ -30,6 +30,7 @@ pre code {
   min-width: 100%;
   width: max-content;
   white-space: pre;
+  word-spacing: normal;
 }
 
 @media (max-width: 640px) {

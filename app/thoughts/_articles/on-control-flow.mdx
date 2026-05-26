@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'On Control Flow',
-  date: '2025.09.30',
+  date: '2026.05.26',
   description: 'How systems become what they were never meant to be',
 }
 
@@ -10,9 +10,9 @@ export const metadata = {
 >
 >  — Friedrich Nietzsche
 
-In C, a function call is a name and a set of arguments. The compiler reduces it to an address loaded into a register and a jump instruction, stored in the same writable memory as the rest of the program's data. Anything that can write to that memory can change where the jump goes.
+The quote is a little grand for a C struct, but bear with me here. In C source, `obj->handler(obj->buffer)` tells you which field supplies the function pointer. It does not tell you what address will be stored in that field when the line runs, though. If a write into `buffer` continues into `handler`, the next call uses the overwritten pointer just as readily as the original one.
 
-In this struct, a [function pointer](https://en.wikipedia.org/wiki/Function_pointer) sits directly after a 64-byte buffer:
+Why does this matter? The field after the buffer is the function pointer the program calls next. In a small example, it looks like this:
 ```c
 struct Object {
     char buffer[64];
@@ -25,30 +25,63 @@ void process(struct Object *obj, char *input) {
 }
 ```
 
-`strcpy(){:c}` doesn't check bounds, so [overflowing](https://en.wikipedia.org/wiki/Buffer_overflow) past 64 bytes writes directly into `handler`.
+Because `strcpy(){:c}` does not know how much space `buffer` has, it keeps copying bytes from `input` until it reaches the null byte at the end. A long enough input runs past the 64 bytes reserved for the buffer and starts overwriting the next field in the struct.
+
+If data memory is executable, the input can include instructions and overwrite `handler` with an address back into the buffer.
 
 <BlockSideTitle title={<>
-  The buffer and function pointer are adjacent in memory.
+  The overflow changes the address stored in `handler`.
 </>}>
-```
-+---------------------+
-|  buffer (64 bytes)    |  <- input
-+---------------------+
-|  handler (8 bytes)    |  <- overflow
-+---------------------+
+```txt
+Before overflow:
++---------+------------------------+
+| buffer  | input data             |
++---------+------------------------+
+| handler | -> handle()            |
++---------+------------------------+
+
+After overflow:
++---------+------------------------+
+| buffer  | code bytes from input  |
++---------+------------------------+
+| handler | -> buffer              |
++---------+------------------------+
 ```
 </BlockSideTitle>
 
-When the program calls `obj->handler(){:c}`, the processor loads whatever address is stored there and jumps; the instruction is the same whether the address came from the compiler or from input that overran the buffer. Every indirect call works this way (vtable dispatch, callbacks, computed jumps), and the only thing separating a valid target from a corrupted one is the conventions the compiler followed, which exist only in the compiled code.
+At that point, the program has not broken its own rules so much as followed a rule that was too loose; an address was loaded, and execution continued there...
 
 ## Convention
 
-[DEP](https://en.wikipedia.org/wiki/Executable-space_protection) separated code from data by marking data memory as non-executable, so even if an attacker overwrites a pointer, shellcode on the stack or heap won't run.
+Older exploits could be as direct as the diagram suggests. The input contained instructions, and the overwritten `handler` pointed back to the buffer that held them. [DEP](https://en.wikipedia.org/wiki/Executable-space_protection) (Data Execution Prevention) made that route harder because the stack and heap could still hold the input, but the processor would no longer execute instructions from those data pages.
 
-The program's own compiled code is still executable, though, and [return-oriented programming](https://en.wikipedia.org/wiki/Return-oriented_programming) chains short sequences of it (each ending in a `ret{:asm}`) by arranging their addresses on the stack, so each return passes control to the next. The instructions being executed are the compiler's, but what they 'do' depends on the order they run in, and the order is controlled by whatever the attacker put on the stack, all while DEP's separation of code and data holds.
+Even after DEP made stack bytes non-executable, ordinary returns still read their next address from that same stack. If an attacker can overwrite saved return addresses, each `ret{:asm}` can be made to continue at a chosen sequence of existing instructions. Return-oriented programming, or [ROP](https://en.wikipedia.org/wiki/Return-oriented_programming), builds a chain out of those sequences, many of which end in another `ret{:asm}`. In summary, DEP still prevents the stack from *becoming* code, whereas ROP uses the stack to choose existing code instead, producing behavior from the order of the returns rather than from new instructions.
+
+If you've cared to read this far, you may wonder: "If ROP stays inside executable code, what is the processor supposed to reject?" Good question. Nietzsche would have something to say here, but we'll get to that.
 
 ## Constraint
 
-[CFI](https://en.wikipedia.org/wiki/Control-flow_integrity) restricts where indirect calls can land by checking that targets are valid function entries, and [CET](https://en.wikipedia.org/wiki/Control-flow_enforcement_technology) adds a second copy of return addresses (in memory that software can't write to) checked on every `ret{:asm}`, and requires indirect call targets to be marked in the binary.
+The answer is that "executable" is only one fact about an address, and control flow still has to interpret how that address is being reached. In a ROP chain, a return can land in the middle of another function while every byte it executes still comes from a code page. At that point, a defense has to describe which targets make sense for each kind of control transfer:
 
-For decades, the processor just executed whatever address it was given, and what counted as valid control flow was defined entirely by convention in the compiled code. CFI and CET make the processor check calls and returns against constraints that, until now, only existed in the compiler's output. Every generation of control flow defense so far has eventually been [outgrown](https://cispa.de/en/cfop). I think the pace of that cycle is part of why these defenses are moving into the hardware, and why security professionals and software engineers alike need to understand control flow at both levels in order to build systems on top of rapidly changing assumptions, safely.
+<BlockSideTitle title={<>
+  Control flow checks connect the branch to where it lands.
+</>}>
+```txt
+Normal flow:
+call [Object.handler]     -> handle()
+ret  [saved return addr]  -> after call
+
+ROP flow:
+ret  [overwritten addr]   -> code fragment
+```
+</BlockSideTitle>
+
+[CFI](https://en.wikipedia.org/wiki/Control-flow_integrity) (Control Flow Integrity) gives the program a means to enforce those relationships explicitly. A call through `handler` can be checked against the set of functions that are valid for that call rather than being allowed to land anywhere executable.
+
+More recently, [CET](https://en.wikipedia.org/wiki/Control-flow_enforcement_technology) (Control Flow Enforcement Technology) gives newer processors hardware support for related checks. For returns, the processor can keep a protected shadow copy of the expected address and compare it when `ret{:asm}` runs. For indirect branches, the destination must be a marked entry point rather than an arbitrary spot in the instruction stream. In both cases, the processor gets more context than the raw address alone, which we've learned is not enough to safely describe valid control flow.
+
+## Conclusion
+
+The blissfully ignorant machine can be right about the address and wrong about the path, and this is the pesky place where Nietzsche is incessantly but undeniably correct. The address is a fact the processor can act on, but whether that address belongs to this return or this indirect call is an interpretation the raw address cannot support by itself. And by the time the processor branches, most of the program has collapsed into values in memory, which no longer carry much of the intent that produced them.
+
+If I were to take anything away from this mess, it'd be this: ROP remains viable under DEP because it reuses executable instructions, but those instructions are reached through corrupted control flow. It seems as if the most useful defenses work by preserving just enough provenance at the branch itself to tell whether the address is a valid target for that branch, and consequently to reject a destination that is executable but wrong for the path that reached it.
