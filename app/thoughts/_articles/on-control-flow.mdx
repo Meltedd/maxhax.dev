@@ -30,7 +30,7 @@ Because `strcpy(){:c}` does not know how much space `buffer` has, it keeps copyi
 If data memory is executable, the input can include instructions and overwrite `handler` with an address back into the buffer.
 
 <BlockSideTitle title={<>
-  The overflow changes the address stored in `handler`.
+  The overflow changes the address stored in handler.
 </>}>
 ```txt
 Before overflow:
@@ -49,7 +49,7 @@ After overflow:
 ```
 </BlockSideTitle>
 
-At that point, the program has not broken its own rules so much as followed a rule that was too loose; an address was loaded, and execution continued there...
+At that point, the program has not broken its own rules so much as followed a rule that was too loose; an address was loaded, and execution continued from there...
 
 ## Convention
 
