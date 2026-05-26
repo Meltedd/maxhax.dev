@@ -23,8 +23,13 @@
     width: 85%;
     margin: 1rem auto 0;
     color: var(--color-rurikon-600);
-    font-size: 0.95em;
+    font-family: var(--serif), Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif;
+    font-optical-sizing: auto;
     font-style: italic;
+    font-weight: 400;
+    font-variant-ligatures: contextual;
+    letter-spacing: -0.003em;
+    line-height: 1.5;
     text-align: left;
     text-wrap: pretty;
   }
@@ -71,7 +76,6 @@
   details p:first-of-type { margin-top: 0; }
 
   pre {
-    font-size: 0.82em;
     margin-block: 1.5rem 1.75rem;
   }
 
