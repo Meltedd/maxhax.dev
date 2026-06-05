@@ -43,13 +43,5 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.59.4"
   },
-  "packageManager": "pnpm@10.24.0",
-  "pnpm": {
-    "overrides": {
-      "micromatch>picomatch": ">=2.3.2",
-      "tinyglobby>picomatch": ">=4.0.4",
-      "next>postcss": ">=8.5.10",
-      "brace-expansion@5": ">=5.0.6"
-    }
-  }
+  "packageManager": "pnpm@10.24.0"
 }
