@@ -26,7 +26,9 @@ export function TimelineEntry({ entry, delay }: TimelineEntryProps) {
       style={{ animationDelay: `${delay}s` }}
       data-year={entry.year}
     >
-      <div className='entry-connector' />
+      <svg className='entry-connector' viewBox='0 0 21 15' aria-hidden='true'>
+        <polyline points='0,0 15,15 21,15' />
+      </svg>
       <div className='entry-content'>
         <span className='entry-month'>{entry.month}</span>
         <p>{entry.body.map(renderBodyPart)}</p>

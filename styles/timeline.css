@@ -174,45 +174,27 @@
   position: absolute;
   top: var(--timeline-connector-top);
   width: var(--branch-length);
-  height: 1px;
-  background: var(--color-rurikon-400);
+  aspect-ratio: 21 / 15;
+  overflow: visible;
   opacity: 0.35;
+}
+
+.entry-connector polyline {
+  fill: none;
+  stroke: var(--color-rurikon-400);
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
 }
 
 .timeline-entry:nth-child(odd of .timeline-entry) .entry-connector {
   left: calc(var(--timeline-axis) + 0.4rem);
-  transform: rotate(45deg);
-  transform-origin: left center;
-}
-
-.timeline-entry:nth-child(odd of .timeline-entry) .entry-connector::after {
-  content: '';
-  position: absolute;
-  right: -0.5rem;
-  top: 0;
-  transform: rotate(-45deg);
-  width: 0.5rem;
-  height: 1px;
-  background: var(--color-rurikon-400);
-  transform-origin: left center;
 }
 
 .timeline-entry:nth-child(even of .timeline-entry) .entry-connector {
-  left: calc(var(--timeline-axis) - 0.4rem - var(--branch-length));
-  transform: rotate(-45deg);
-  transform-origin: right center;
-}
-
-.timeline-entry:nth-child(even of .timeline-entry) .entry-connector::after {
-  content: '';
-  position: absolute;
-  left: -0.5rem;
-  top: 0;
-  transform: rotate(45deg);
-  width: 0.5rem;
-  height: 1px;
-  background: var(--color-rurikon-400);
-  transform-origin: right center;
+  right: calc(var(--timeline-axis) + 0.4rem);
+  transform: scaleX(-1);
 }
 
 .entry-month {
