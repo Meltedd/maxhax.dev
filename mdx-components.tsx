@@ -161,7 +161,6 @@ export const components: Record<
           src={image.default}
           alt={alt}
           quality={95}
-          placeholder='blur'
           draggable={false}
         />
       )
