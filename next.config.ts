@@ -40,5 +40,6 @@ export default withMDX()({
   images: {
     contentDispositionType: 'inline',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    qualities: [95],
   },
 } satisfies NextConfig)
