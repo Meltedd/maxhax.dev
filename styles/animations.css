@@ -1,12 +1,11 @@
 @keyframes textBlurIn {
-  0% { filter: blur(4px); opacity: 0; transform: scale(0.98); }
-  50% { filter: blur(1px); opacity: 0.6; transform: scale(0.99); }
-  100% { filter: blur(0px); opacity: 1; transform: scale(1.0); }
+  0% { filter: blur(4px); opacity: 0; }
+  50% { filter: blur(1px); opacity: 0.6; }
+  100% { filter: blur(0px); opacity: 1; }
 }
 
 @keyframes textFadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% { color: transparent; }
 }
 
 @keyframes dotScale {
@@ -32,11 +31,14 @@
 
 .stagger-title {
   animation: textBlurIn 0.4s ease-out backwards;
+  display: inline-block;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .stagger-dot {
   animation: dotScale 0.5s ease-out backwards;
-  animation-delay: 3.5s;
+  animation-delay: 3.2s;
 }
 
 .stagger-word {
