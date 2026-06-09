@@ -74,5 +74,3 @@ export async function generateMetadata({ params }: GenerateMetadataProps) {
     return {}
   }
 }
-
-export const dynamic = 'force-static'

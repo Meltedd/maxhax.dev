@@ -4,7 +4,6 @@ import { Analytics } from '@vercel/analytics/next'
 import cn from 'clsx'
 import localFont from 'next/font/local'
 import { EB_Garamond } from 'next/font/google'
-import 'katex/dist/katex.min.css'
 
 import { Navbar } from '@/components/Navbar'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -57,8 +56,6 @@ export const viewport: Viewport = {
   colorScheme: 'only light',
   themeColor: '#fcfcfc',
 }
-
-export const dynamic = 'force-static'
 
 export default function RootLayout({
   children,

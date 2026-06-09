@@ -31,12 +31,10 @@ export default withMDX()({
     ]
   },
   experimental: {
-    viewTransition: true,
     mdxRs: {
       mdxType: 'gfm',
     },
   },
-  transpilePackages: ['shiki'],
   images: {
     contentDispositionType: 'inline',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",

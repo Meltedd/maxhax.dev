@@ -6,8 +6,6 @@ export const metadata = {
   title: 'Thoughts',
 }
 
-export const dynamic = 'force-static'
-
 /** Parse a `YYYY.MM.DD` date string into a numeric sort key (YYYYMMDD), or 0 if malformed. */
 function dateSortKey(date: string): number {
   const parts = date.split('.')

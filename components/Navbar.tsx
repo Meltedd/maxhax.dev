@@ -4,14 +4,8 @@ import cn from 'clsx'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 
-function Item(props: React.ComponentProps<typeof Link>) {
+function Item({ href, children }: { href: string; children: React.ReactNode }) {
   const pathname = usePathname()
-  const href = props.href
-
-  if (typeof href !== 'string') {
-    throw new Error('`href` must be a string')
-  }
-
   const isActive = pathname === href || pathname.startsWith(href + '/')
 
   return (
@@ -23,13 +17,15 @@ function Item(props: React.ComponentProps<typeof Link>) {
         '-mx-2'
       )}
     >
-      <Link 
-        {...props} 
-        prefetch={true} 
-        className='inline-block px-2 whitespace-nowrap mobile:w-full' 
+      <Link
+        href={href}
+        prefetch={true}
+        className='inline-block px-2 whitespace-nowrap mobile:w-full'
         draggable={false}
         aria-current={isActive ? 'page' : undefined}
-      />
+      >
+        {children}
+      </Link>
     </li>
   )
 }

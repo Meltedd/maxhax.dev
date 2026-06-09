@@ -5,9 +5,6 @@ import { codeToHtml } from 'shiki'
 import Link from 'next/link'
 import Image from 'next/image'
 
-// @ts-expect-error - react-katex doesn't have proper TypeScript declarations
-import { InlineMath, BlockMath } from 'react-katex'
-
 import { BlockSideTitle } from '@/components/BlockSideTitle'
 
 const CODE_THEME = 'gruvbox-light-soft'
@@ -174,8 +171,6 @@ export const components: Record<
   },
   hr: (props) => <hr className='my-16 w-32 border-rurikon-border' {...props} />,
   BlockSideTitle,
-  InlineMath,
-  BlockMath,
 }
 
 export function useMDXComponents(inherited: MDXComponents): MDXComponents {
