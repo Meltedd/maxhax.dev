@@ -1,8 +1,6 @@
 'use server'
 
-import { headers } from 'next/headers'
 import { Resend } from 'resend'
-import { isRateLimited } from './rate-limit'
 
 const MAX_SUBJECT_LENGTH = 200
 const MAX_MESSAGE_LENGTH = 5000
@@ -43,14 +41,6 @@ export async function sendContactEmail(
   if (!contactEmail || !apiKey) {
     console.error('Missing CONTACT_EMAIL or RESEND_API_KEY environment variables')
     return { success: false, error: 'Server configuration error' }
-  }
-
-  const headersList = await headers()
-  const ip =
-    headersList.get('x-real-ip')?.trim() ||
-    headersList.get('x-forwarded-for')?.split(',')[0].trim()
-  if (await isRateLimited(ip)) {
-    return { success: false, error: 'Too many requests. Please try again later.' }
   }
 
   try {
