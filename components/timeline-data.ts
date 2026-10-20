@@ -205,7 +205,7 @@ export const timelineEntries: TimelineEntry[] = [
     body: [
       { type: 'text', text: 'Ranked as ' },
       { type: 'link', text: 'Netflix\'s #1 hacker', href: 'https://hackerone.com/netflix/thanks/2026' },
-      { type: 'text', text: ' of 2026 (#3 all-time) on HackerOne\'s leaderboard!' },
+      { type: 'text', text: ' for 2026 on HackerOne\'s leaderboard!' },
     ],
   },
 ]
