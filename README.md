@@ -8,7 +8,7 @@ Source for [maxhax.dev](https://maxhax.dev).
 
 ## Setup
 
-Requires Node 18.18+ and pnpm.
+Use Node 24 LTS and pnpm.
 
 ```bash
 pnpm install
